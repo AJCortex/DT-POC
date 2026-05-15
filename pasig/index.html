@@ -1,0 +1,1807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pasig River Digital Twin — Plastic Pollution Monitor</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #070d14;
+    --surface: #0d1a27;
+    --surface2: #112233;
+    --border: rgba(0,180,255,0.15);
+    --accent: #00b4ff;
+    --accent2: #00ffb3;
+    --warn: #ffb300;
+    --danger: #ff3d3d;
+    --text: #e0eeff;
+    --muted: #5a7a99;
+    --red: #ff3d3d;
+    --orange: #ff7b00;
+    --yellow: #ffcc00;
+    --green: #00e87a;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    z-index: 10;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #00b4ff, #00ffb3);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text h1 {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+  }
+
+  .logo-text p {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 1px;
+  }
+
+  .header-center {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+  }
+
+  .live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent2);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.5; transform:scale(1.3); }
+  }
+
+  .header-stats {
+    display: flex;
+    gap: 20px;
+  }
+
+  .hstat {
+    text-align: right;
+  }
+
+  .hstat-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--warn);
+  }
+
+  .hstat-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    display: grid;
+    grid-template-columns: 260px 1fr 300px;
+    flex: 1;
+    overflow: hidden;
+    gap: 0;
+  }
+
+  /* LEFT PANEL */
+  .left-panel {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .panel-section {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+  }
+
+  .panel-section h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* DATA LAYER TOGGLES */
+  .layer-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .layer-item:last-child { border-bottom: none; }
+
+  .layer-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .layer-dot {
+    width: 10px; height: 10px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .layer-name {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .layer-sub {
+    font-size: 10px;
+    color: var(--muted);
+  }
+
+  .toggle {
+    width: 32px; height: 18px;
+    background: var(--border);
+    border-radius: 9px;
+    position: relative;
+    transition: background 0.2s;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+
+  .toggle.on { background: var(--accent); }
+
+  .toggle::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 12px; height: 12px;
+    background: white;
+    border-radius: 50%;
+    transition: left 0.2s;
+  }
+
+  .toggle.on::after { left: 17px; }
+
+  /* METRICS */
+  .metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .metric-row:last-child { border-bottom: none; }
+
+  .metric-label {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .metric-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .metric-bar {
+    height: 3px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 2px;
+    margin-top: 4px;
+    overflow: hidden;
+  }
+
+  .metric-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 1s ease;
+  }
+
+  /* DATA SOURCES */
+  .source-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 11px;
+  }
+
+  .source-item:last-child { border-bottom: none; }
+
+  .source-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .src-sat { background: rgba(0,180,255,0.2); color: var(--accent); border: 1px solid rgba(0,180,255,0.3); }
+  .src-gov { background: rgba(0,255,179,0.15); color: var(--accent2); border: 1px solid rgba(0,255,179,0.3); }
+  .src-sur { background: rgba(255,179,0,0.15); color: var(--warn); border: 1px solid rgba(255,179,0,0.3); }
+  .src-sen { background: rgba(180,100,255,0.15); color: #b464ff; border: 1px solid rgba(180,100,255,0.3); }
+
+  .source-text { color: var(--text); }
+  .source-time { color: var(--muted); margin-left: auto; white-space: nowrap; }
+
+  /* MAP AREA */
+  .map-container {
+    position: relative;
+    overflow: hidden;
+    background: #071220;
+  }
+
+  /* SVG MAP */
+  .map-svg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  /* Heatmap canvas overlay */
+  #heatCanvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.75;
+    mix-blend-mode: screen;
+  }
+
+  /* Alert markers */
+  .map-alert {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    z-index: 5;
+  }
+
+  .alert-ring {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    position: relative;
+    transition: transform 0.2s;
+  }
+
+  .alert-ring:hover { transform: scale(1.3); }
+
+  .alert-ring::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid;
+    opacity: 0.4;
+    animation: ripple 2s infinite;
+  }
+
+  @keyframes ripple {
+    0% { transform: scale(1); opacity: 0.4; }
+    100% { transform: scale(1.8); opacity: 0; }
+  }
+
+  .alert-ring.critical { border-color: var(--red); color: var(--red); background: rgba(255,61,61,0.15); }
+  .alert-ring.critical::before { border-color: var(--red); }
+  .alert-ring.high { border-color: var(--orange); color: var(--orange); background: rgba(255,123,0,0.15); }
+  .alert-ring.high::before { border-color: var(--orange); }
+  .alert-ring.medium { border-color: var(--yellow); color: var(--yellow); background: rgba(255,204,0,0.12); }
+  .alert-ring.medium::before { border-color: var(--yellow); }
+
+  /* Tooltip */
+  .map-tooltip {
+    position: absolute;
+    background: rgba(7,13,20,0.95);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 11px;
+    min-width: 180px;
+    pointer-events: none;
+    z-index: 20;
+    display: none;
+    backdrop-filter: blur(8px);
+  }
+
+  .map-tooltip.show { display: block; }
+
+  .tooltip-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 3px;
+  }
+
+  .tooltip-key { color: var(--muted); }
+  .tooltip-val { font-weight: 600; }
+
+  /* Map overlays */
+  .map-legend {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    background: rgba(7,13,20,0.88);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 10px;
+    backdrop-filter: blur(6px);
+    z-index: 6;
+  }
+
+  .map-legend h4 {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 7px;
+  }
+
+  .legend-bar {
+    width: 140px;
+    height: 8px;
+    border-radius: 4px;
+    background: linear-gradient(to right, #00e87a, #ffcc00, #ff7b00, #ff3d3d);
+    margin-bottom: 3px;
+  }
+
+  .legend-labels {
+    display: flex;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 9px;
+  }
+
+  /* Timeline scrubber */
+  .timeline {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(7,13,20,0.88);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 6;
+    backdrop-filter: blur(6px);
+  }
+
+  .timeline label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--accent);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .timeline input[type=range] {
+    width: 200px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .timeline-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--warn);
+    white-space: nowrap;
+    min-width: 70px;
+  }
+
+  /* Map coords */
+  .map-coords {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(7,13,20,0.8);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    z-index: 6;
+    letter-spacing: 0.05em;
+  }
+
+  /* RIGHT PANEL */
+  .right-panel {
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    gap: 0;
+  }
+
+  /* Camera feeds */
+  .cam-section {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cam-section h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .cam-feed {
+    background: #050e18;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .cam-feed:hover { border-color: var(--accent); }
+  .cam-feed.active { border-color: var(--accent); }
+
+  .cam-viewport {
+    width: 100%;
+    aspect-ratio: 16/9;
+    position: relative;
+    overflow: hidden;
+    background: #020810;
+  }
+
+  /* Animated river simulation */
+  .cam-river {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .river-layer {
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    animation: riverFlow linear infinite;
+  }
+
+  @keyframes riverFlow {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .cam-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to bottom, rgba(2,8,16,0.3) 0%, transparent 30%, rgba(2,8,16,0.4) 100%);
+    pointer-events: none;
+  }
+
+  .cam-hud {
+    position: absolute;
+    top: 5px; left: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    color: rgba(255,255,255,0.7);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .cam-hud .rec {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--red);
+    animation: pulse 1s infinite;
+  }
+
+  .cam-bottom {
+    position: absolute;
+    bottom: 5px; left: 5px; right: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .cam-ai-tag {
+    background: rgba(255,61,61,0.3);
+    border: 1px solid var(--red);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 7px;
+    color: var(--red);
+  }
+
+  .cam-timestamp {
+    font-family: 'Space Mono', monospace;
+    font-size: 7px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .cam-meta {
+    padding: 6px 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cam-name {
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .cam-pci {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  /* AI Detection box overlay */
+  .detect-box {
+    position: absolute;
+    border: 1px solid;
+    border-radius: 2px;
+    font-family: 'Space Mono', monospace;
+    font-size: 6px;
+    padding: 1px 3px;
+    animation: detectFade 3s ease-in-out infinite;
+  }
+
+  @keyframes detectFade {
+    0%,100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  /* AI Events log */
+  .events-section {
+    padding: 12px;
+    flex: 1;
+  }
+
+  .events-section h3 {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .event-item {
+    display: flex;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 11px;
+    align-items: flex-start;
+    animation: fadeIn 0.5s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .event-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+
+  .event-text {
+    flex: 1;
+    color: var(--text);
+    line-height: 1.4;
+  }
+
+  .event-text strong { color: var(--warn); }
+
+  .event-time {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  /* Pollution index bar */
+  .pci-bar-wrap {
+    margin: 8px 0 4px;
+  }
+
+  .pci-bar {
+    height: 6px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.05);
+    overflow: hidden;
+    margin-bottom: 3px;
+  }
+
+  .pci-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(to right, #00e87a, #ffcc00, #ff7b00, #ff3d3d);
+    transition: width 0.5s ease;
+  }
+
+  .pci-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Number counter animation */
+  @keyframes countUp {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .count-anim { animation: countUp 0.5s ease; }
+
+  /* scan lines effect on camera */
+  .scanlines {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.08) 2px,
+      rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .alert-banner {
+    background: rgba(255,61,61,0.1);
+    border: 1px solid rgba(255,61,61,0.3);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 11px;
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🌊</div>
+    <div class="logo-text">
+      <h1>PASIG RIVER DIGITAL TWIN</h1>
+      <p>Plastic Pollution Monitoring System · Manila, Philippines</p>
+    </div>
+  </div>
+  <div class="header-center">
+    <div class="live-dot"></div>
+    <span style="color:var(--accent2); font-family:'Space Mono',monospace; font-size:11px;">LIVE MONITORING</span>
+    <span style="color:var(--muted); font-size:11px; margin-left:8px;" id="clock"></span>
+  </div>
+  <div class="header-stats">
+    <div class="hstat">
+      <div class="hstat-val" id="totalTons">47.3t</div>
+      <div class="hstat-label">Plastic Today</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val" style="color:var(--red)">CRITICAL</div>
+      <div class="hstat-label">River Status</div>
+    </div>
+    <div class="hstat">
+      <div class="hstat-val" style="color:var(--accent2)">12</div>
+      <div class="hstat-label">Active Sensors</div>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <!-- Data Layers -->
+    <div class="panel-section">
+      <h3>⚙ Data Layers</h3>
+
+      <div class="layer-item" onclick="toggleLayer(this, 'heatmap')">
+        <div class="layer-left">
+          <div class="layer-dot" style="background:#ff3d3d;"></div>
+          <div>
+            <div class="layer-name">Plastic Heatmap</div>
+            <div class="layer-sub">Density concentration</div>
+          </div>
+        </div>
+        <div class="toggle on" data-layer="heatmap"></div>
+      </div>
+
+      <div class="layer-item" onclick="toggleLayer(this, 'satellite')">
+        <div class="layer-left">
+          <div class="layer-dot" style="background:#00b4ff;"></div>
+          <div>
+            <div class="layer-name">Satellite Imagery</div>
+            <div class="layer-sub">Sentinel-2 · 10m res</div>
+          </div>
+        </div>
+        <div class="toggle on" data-layer="satellite"></div>
+      </div>
+
+      <div class="layer-item" onclick="toggleLayer(this, 'flow')">
+        <div class="layer-left">
+          <div class="layer-dot" style="background:#00ffb3;"></div>
+          <div>
+            <div class="layer-name">Flow Vectors</div>
+            <div class="layer-sub">Current direction</div>
+          </div>
+        </div>
+        <div class="toggle on" data-layer="flow"></div>
+      </div>
+
+      <div class="layer-item" onclick="toggleLayer(this, 'sources')">
+        <div class="layer-left">
+          <div class="layer-dot" style="background:#ffb300;"></div>
+          <div>
+            <div class="layer-name">Pollution Sources</div>
+            <div class="layer-sub">Outfalls + informal dumps</div>
+          </div>
+        </div>
+        <div class="toggle on" data-layer="sources"></div>
+      </div>
+
+      <div class="layer-item" onclick="toggleLayer(this, 'cameras')">
+        <div class="layer-left">
+          <div class="layer-dot" style="background:#b464ff;"></div>
+          <div>
+            <div class="layer-name">Camera Nodes</div>
+            <div class="layer-sub">6 active CCTV feeds</div>
+          </div>
+        </div>
+        <div class="toggle on" data-layer="cameras"></div>
+      </div>
+
+      <div class="layer-item" onclick="toggleLayer(this, 'risk')">
+        <div class="layer-left">
+          <div class="layer-dot" style="background:#ff7b00;"></div>
+          <div>
+            <div class="layer-name">Risk Zones</div>
+            <div class="layer-sub">Gov-designated areas</div>
+          </div>
+        </div>
+        <div class="toggle" data-layer="risk"></div>
+      </div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="panel-section">
+      <h3>📊 Real-Time Metrics</h3>
+
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">Plastic Conc. Index</div>
+          <div class="metric-bar"><div class="metric-fill" style="width:82%; background:var(--red);"></div></div>
+        </div>
+        <div class="metric-val" style="color:var(--red)">82</div>
+      </div>
+
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">Water Turbidity</div>
+          <div class="metric-bar"><div class="metric-fill" style="width:67%; background:var(--orange);"></div></div>
+        </div>
+        <div class="metric-val" style="color:var(--orange)">67</div>
+      </div>
+
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">Flow Velocity</div>
+          <div class="metric-bar"><div class="metric-fill" style="width:44%; background:var(--accent);"></div></div>
+        </div>
+        <div class="metric-val" style="color:var(--accent)">1.2m/s</div>
+      </div>
+
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">Surface Coverage</div>
+          <div class="metric-bar"><div class="metric-fill" style="width:58%; background:var(--yellow);"></div></div>
+        </div>
+        <div class="metric-val" style="color:var(--yellow)">58%</div>
+      </div>
+
+      <div class="metric-row">
+        <div>
+          <div class="metric-label">AI Detection Conf.</div>
+          <div class="metric-bar"><div class="metric-fill" style="width:91%; background:var(--accent2);"></div></div>
+        </div>
+        <div class="metric-val" style="color:var(--accent2)">91%</div>
+      </div>
+    </div>
+
+    <!-- Data Sources -->
+    <div class="panel-section">
+      <h3>🛰 Data Sources</h3>
+
+      <div class="source-item">
+        <span class="source-badge src-sat">SAT</span>
+        <div>
+          <div class="source-text">Sentinel-2 Multispectral</div>
+          <div style="color:var(--muted); font-size:9px;">ESA Copernicus · Band 11+12</div>
+        </div>
+        <span class="source-time">6h ago</span>
+      </div>
+
+      <div class="source-item">
+        <span class="source-badge src-sat">SAT</span>
+        <div>
+          <div class="source-text">PlanetScope Daily</div>
+          <div style="color:var(--muted); font-size:9px;">3m resolution · RGB+NIR</div>
+        </div>
+        <span class="source-time">2h ago</span>
+      </div>
+
+      <div class="source-item">
+        <span class="source-badge src-gov">GOV</span>
+        <div>
+          <div class="source-text">PRRC Monitoring Data</div>
+          <div style="color:var(--muted); font-size:9px;">Pasig River Rehab Commission</div>
+        </div>
+        <span class="source-time">Live</span>
+      </div>
+
+      <div class="source-item">
+        <span class="source-badge src-gov">GOV</span>
+        <div>
+          <div class="source-text">DENR Water Quality</div>
+          <div style="color:var(--muted); font-size:9px;">Dept of Environment · PH</div>
+        </div>
+        <span class="source-time">1h ago</span>
+      </div>
+
+      <div class="source-item">
+        <span class="source-badge src-sur">SURV</span>
+        <div>
+          <div class="source-text">Field Survey Teams</div>
+          <div style="color:var(--muted); font-size:9px;">12 ground-truth stations</div>
+        </div>
+        <span class="source-time">3h ago</span>
+      </div>
+
+      <div class="source-item">
+        <span class="source-badge src-sur">SURV</span>
+        <div>
+          <div class="source-text">Boat Transect Data</div>
+          <div style="color:var(--muted); font-size:9px;">Weekly GPS sampling runs</div>
+        </div>
+        <span class="source-time">Yesterday</span>
+      </div>
+
+      <div class="source-item">
+        <span class="source-badge src-sen">IOT</span>
+        <div>
+          <div class="source-text">Floating IoT Sensors</div>
+          <div style="color:var(--muted); font-size:9px;">pH · turbidity · plastic spectra</div>
+        </div>
+        <span class="source-time">Live</span>
+      </div>
+    </div>
+
+    <!-- Pollution Index Scale -->
+    <div class="panel-section">
+      <h3>📈 Pollution Index</h3>
+      <div class="pci-bar-wrap">
+        <div class="pci-bar">
+          <div class="pci-fill" style="width:82%;"></div>
+        </div>
+        <div class="pci-labels">
+          <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+        </div>
+      </div>
+      <div style="margin-top:8px; display:flex; flex-direction:column; gap:4px;">
+        <div style="display:flex; align-items:center; gap:6px; font-size:10px;">
+          <div style="width:8px;height:8px;border-radius:2px;background:#00e87a;"></div>
+          <span style="color:var(--muted);">0-25 Clean</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; font-size:10px;">
+          <div style="width:8px;height:8px;border-radius:2px;background:#ffcc00;"></div>
+          <span style="color:var(--muted);">25-50 Moderate</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; font-size:10px;">
+          <div style="width:8px;height:8px;border-radius:2px;background:#ff7b00;"></div>
+          <span style="color:var(--muted);">50-75 High</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; font-size:10px;">
+          <div style="width:8px;height:8px;border-radius:2px;background:#ff3d3d;"></div>
+          <span style="color:var(--muted);">75-100 Critical</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MAP -->
+  <div class="map-container" id="mapContainer">
+
+    <canvas id="heatCanvas"></canvas>
+
+    <!-- River SVG Map -->
+    <svg class="map-svg" viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" id="mapSvg">
+      <!-- Background -->
+      <rect width="900" height="600" fill="#071220"/>
+
+      <!-- Grid lines -->
+      <g stroke="rgba(0,180,255,0.06)" stroke-width="1">
+        <line x1="0" y1="100" x2="900" y2="100"/>
+        <line x1="0" y1="200" x2="900" y2="200"/>
+        <line x1="0" y1="300" x2="900" y2="300"/>
+        <line x1="0" y1="400" x2="900" y2="400"/>
+        <line x1="0" y1="500" x2="900" y2="500"/>
+        <line x1="150" y1="0" x2="150" y2="600"/>
+        <line x1="300" y1="0" x2="300" y2="600"/>
+        <line x1="450" y1="0" x2="450" y2="600"/>
+        <line x1="600" y1="0" x2="600" y2="600"/>
+        <line x1="750" y1="0" x2="750" y2="600"/>
+      </g>
+
+      <!-- Urban blocks / land -->
+      <g fill="#0a1a2a" stroke="rgba(0,180,255,0.08)" stroke-width="0.5">
+        <!-- North bank urban -->
+        <rect x="0" y="0" width="900" height="195" rx="0"/>
+        <!-- South bank urban -->
+        <rect x="0" y="365" width="900" height="235" rx="0"/>
+      </g>
+
+      <!-- Building clusters simplified -->
+      <g fill="#0d2238" stroke="rgba(0,180,255,0.06)" stroke-width="0.5">
+        <rect x="20" y="20" width="60" height="40"/>
+        <rect x="90" y="30" width="40" height="30"/>
+        <rect x="140" y="15" width="70" height="50"/>
+        <rect x="220" y="25" width="50" height="35"/>
+        <rect x="280" y="10" width="80" height="45"/>
+        <rect x="370" y="20" width="55" height="38"/>
+        <rect x="440" y="30" width="65" height="42"/>
+        <rect x="520" y="15" width="45" height="35"/>
+        <rect x="575" y="25" width="70" height="40"/>
+        <rect x="660" y="10" width="55" height="45"/>
+        <rect x="725" y="20" width="80" height="38"/>
+        <rect x="815" y="15" width="70" height="50"/>
+
+        <rect x="20" y="70" width="50" height="35"/>
+        <rect x="80" y="80" width="70" height="28"/>
+        <rect x="160" y="75" width="45" height="32"/>
+        <rect x="215" y="68" width="60" height="40"/>
+        <rect x="285" y="72" width="55" height="35"/>
+        <rect x="350" y="65" width="70" height="38"/>
+        <rect x="430" y="75" width="50" height="30"/>
+        <rect x="490" y="70" width="65" height="35"/>
+        <rect x="565" y="68" width="55" height="40"/>
+        <rect x="630" y="75" width="70" height="35"/>
+        <rect x="710" y="65" width="50" height="42"/>
+        <rect x="770" y="70" width="60" height="35"/>
+        <rect x="840" y="72" width="55" height="38"/>
+
+        <rect x="30" y="130" width="55" height="40"/>
+        <rect x="95" y="135" width="60" height="35"/>
+        <rect x="165" y="128" width="50" height="42"/>
+        <rect x="225" y="132" width="70" height="38"/>
+        <rect x="305" y="125" width="55" height="45"/>
+        <rect x="370" y="130" width="65" height="40"/>
+        <rect x="445" y="128" width="50" height="42"/>
+        <rect x="505" y="135" width="60" height="35"/>
+        <rect x="575" y="128" width="70" height="42"/>
+        <rect x="655" y="132" width="55" height="38"/>
+        <rect x="720" y="125" width="65" height="45"/>
+        <rect x="795" y="130" width="50" height="40"/>
+        <rect x="855" y="128" width="40" height="42"/>
+
+        <!-- South bank buildings -->
+        <rect x="20" y="375" width="65" height="40"/>
+        <rect x="95" y="380" width="50" height="35"/>
+        <rect x="155" y="372" width="70" height="42"/>
+        <rect x="235" y="378" width="55" height="38"/>
+        <rect x="300" y="370" width="65" height="45"/>
+        <rect x="375" y="375" width="50" height="40"/>
+        <rect x="435" y="380" width="70" height="38"/>
+        <rect x="515" y="372" width="55" height="42"/>
+        <rect x="580" y="378" width="65" height="40"/>
+        <rect x="655" y="370" width="55" height="45"/>
+        <rect x="720" y="375" width="70" height="40"/>
+        <rect x="800" y="380" width="55" height="38"/>
+        <rect x="865" y="372" width="30" height="42"/>
+
+        <rect x="30" y="430" width="60" height="35"/>
+        <rect x="100" y="435" width="55" height="40"/>
+        <rect x="165" y="428" width="70" height="38"/>
+        <rect x="245" y="432" width="50" height="42"/>
+        <rect x="305" y="425" width="65" height="45"/>
+        <rect x="380" y="430" width="55" height="40"/>
+        <rect x="445" y="435" width="70" height="38"/>
+        <rect x="525" y="428" width="55" height="42"/>
+        <rect x="590" y="432" width="65" height="40"/>
+        <rect x="665" y="425" width="50" height="45"/>
+        <rect x="725" y="430" width="70" height="38"/>
+        <rect x="805" y="428" width="55" height="42"/>
+
+        <rect x="25" y="490" width="55" height="50"/>
+        <rect x="90" y="495" width="70" height="45"/>
+        <rect x="170" y="485" width="55" height="55"/>
+        <rect x="235" y="490" width="65" height="50"/>
+        <rect x="310" y="485" width="70" height="55"/>
+        <rect x="390" y="492" width="55" height="48"/>
+        <rect x="455" y="488" width="65" height="52"/>
+        <rect x="530" y="490" width="70" height="50"/>
+        <rect x="610" y="485" width="55" height="55"/>
+        <rect x="675" y="492" width="70" height="48"/>
+        <rect x="755" y="488" width="55" height="52"/>
+        <rect x="820" y="490" width="75" height="50"/>
+      </g>
+
+      <!-- Roads north -->
+      <g stroke="rgba(0,180,255,0.12)" stroke-width="2" fill="none">
+        <line x1="0" y1="175" x2="900" y2="175"/>
+        <line x1="0" y1="155" x2="900" y2="155"/>
+        <line x1="200" y1="0" x2="200" y2="195"/>
+        <line x1="450" y1="0" x2="450" y2="195"/>
+        <line x1="700" y1="0" x2="700" y2="195"/>
+      </g>
+
+      <!-- Roads south -->
+      <g stroke="rgba(0,180,255,0.12)" stroke-width="2" fill="none">
+        <line x1="0" y1="375" x2="900" y2="375"/>
+        <line x1="0" y1="395" x2="900" y2="395"/>
+        <line x1="200" y1="365" x2="200" y2="600"/>
+        <line x1="450" y1="365" x2="450" y2="600"/>
+        <line x1="700" y1="365" x2="700" y2="600"/>
+      </g>
+
+      <!-- River body -->
+      <path d="M -10 205 Q 100 195, 200 210 Q 350 225, 450 215 Q 580 205, 700 215 Q 800 222, 910 210" 
+            fill="none" stroke="#1a3a5c" stroke-width="2"/>
+      <path d="M -10 355 Q 120 365, 230 350 Q 370 338, 470 348 Q 600 360, 710 350 Q 820 342, 910 352"
+            fill="none" stroke="#1a3a5c" stroke-width="2"/>
+
+      <!-- River fill -->
+      <path d="M -10 205 Q 100 195, 200 210 Q 350 225, 450 215 Q 580 205, 700 215 Q 800 222, 910 210 
+               L 910 352 Q 820 342, 710 350 Q 600 360, 470 348 Q 370 338, 230 350 Q 120 365, -10 355 Z"
+            fill="url(#riverGrad)" opacity="0.9"/>
+
+      <!-- River gradients -->
+      <defs>
+        <linearGradient id="riverGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#0a2235"/>
+          <stop offset="50%" stop-color="#0d2f48"/>
+          <stop offset="100%" stop-color="#0a2235"/>
+        </linearGradient>
+        <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#00b4ff" stop-opacity="0"/>
+          <stop offset="50%" stop-color="#00b4ff" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#00b4ff" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Flow arrows -->
+      <g id="flowLayer" fill="none" stroke="#00b4ff" stroke-width="1" opacity="0.5">
+        <g transform="translate(80, 280)">
+          <line x1="0" y1="0" x2="30" y2="0" stroke-dasharray="4,3">
+            <animate attributeName="stroke-dashoffset" values="0;-7" dur="1s" repeatCount="indefinite"/>
+          </line>
+          <polygon points="30,0 22,-4 22,4" fill="#00b4ff"/>
+        </g>
+        <g transform="translate(180, 268)">
+          <line x1="0" y1="0" x2="30" y2="0" stroke-dasharray="4,3">
+            <animate attributeName="stroke-dashoffset" values="0;-7" dur="1s" repeatCount="indefinite" begin="0.3s"/>
+          </line>
+          <polygon points="30,0 22,-4 22,4" fill="#00b4ff"/>
+        </g>
+        <g transform="translate(300, 275)">
+          <line x1="0" y1="0" x2="30" y2="0" stroke-dasharray="4,3">
+            <animate attributeName="stroke-dashoffset" values="0;-7" dur="1s" repeatCount="indefinite" begin="0.6s"/>
+          </line>
+          <polygon points="30,0 22,-4 22,4" fill="#00b4ff"/>
+        </g>
+        <g transform="translate(420, 270)">
+          <line x1="0" y1="0" x2="30" y2="0" stroke-dasharray="4,3">
+            <animate attributeName="stroke-dashoffset" values="0;-7" dur="1s" repeatCount="indefinite" begin="0.2s"/>
+          </line>
+          <polygon points="30,0 22,-4 22,4" fill="#00b4ff"/>
+        </g>
+        <g transform="translate(540, 272)">
+          <line x1="0" y1="0" x2="30" y2="0" stroke-dasharray="4,3">
+            <animate attributeName="stroke-dashoffset" values="0;-7" dur="1s" repeatCount="indefinite" begin="0.5s"/>
+          </line>
+          <polygon points="30,0 22,-4 22,4" fill="#00b4ff"/>
+        </g>
+        <g transform="translate(660, 270)">
+          <line x1="0" y1="0" x2="30" y2="0" stroke-dasharray="4,3">
+            <animate attributeName="stroke-dashoffset" values="0;-7" dur="1s" repeatCount="indefinite" begin="0.4s"/>
+          </line>
+          <polygon points="30,0 22,-4 22,4" fill="#00b4ff"/>
+        </g>
+        <g transform="translate(780, 267)">
+          <line x1="0" y1="0" x2="30" y2="0" stroke-dasharray="4,3">
+            <animate attributeName="stroke-dashoffset" values="0;-7" dur="1s" repeatCount="indefinite" begin="0.1s"/>
+          </line>
+          <polygon points="30,0 22,-4 22,4" fill="#00b4ff"/>
+        </g>
+      </g>
+
+      <!-- Pollution source markers -->
+      <g id="sourcesLayer">
+        <!-- Outfall pipes -->
+        <g transform="translate(130, 215)">
+          <circle cx="0" cy="0" r="6" fill="rgba(255,179,0,0.3)" stroke="#ffb300" stroke-width="1.5">
+            <animate attributeName="r" values="6;10;6" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="0" cy="0" r="3" fill="#ffb300"/>
+        </g>
+        <g transform="translate(280, 345)">
+          <circle cx="0" cy="0" r="6" fill="rgba(255,179,0,0.3)" stroke="#ffb300" stroke-width="1.5">
+            <animate attributeName="r" values="6;10;6" dur="2.3s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="1;0.5;1" dur="2.3s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="0" cy="0" r="3" fill="#ffb300"/>
+        </g>
+        <g transform="translate(480, 220)">
+          <circle cx="0" cy="0" r="8" fill="rgba(255,61,61,0.3)" stroke="#ff3d3d" stroke-width="1.5">
+            <animate attributeName="r" values="8;13;8" dur="1.8s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="1;0.4;1" dur="1.8s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="0" cy="0" r="4" fill="#ff3d3d"/>
+        </g>
+        <g transform="translate(620, 340)">
+          <circle cx="0" cy="0" r="7" fill="rgba(255,179,0,0.3)" stroke="#ffb300" stroke-width="1.5">
+            <animate attributeName="r" values="7;11;7" dur="2.5s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="1;0.5;1" dur="2.5s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="0" cy="0" r="3.5" fill="#ffb300"/>
+        </g>
+        <g transform="translate(810, 225)">
+          <circle cx="0" cy="0" r="6" fill="rgba(255,123,0,0.3)" stroke="#ff7b00" stroke-width="1.5">
+            <animate attributeName="r" values="6;10;6" dur="2.1s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="1;0.5;1" dur="2.1s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="0" cy="0" r="3" fill="#ff7b00"/>
+        </g>
+      </g>
+
+      <!-- Camera node markers -->
+      <g id="cameraLayer">
+        <g transform="translate(200, 245)" class="cam-marker" data-name="CAM-A1 · Marikina Bridge" style="cursor:pointer;">
+          <circle cx="0" cy="0" r="8" fill="rgba(180,100,255,0.2)" stroke="#b464ff" stroke-width="1.5"/>
+          <text x="0" y="4" text-anchor="middle" font-size="8" fill="#b464ff">📷</text>
+        </g>
+        <g transform="translate(450, 330)" class="cam-marker" data-name="CAM-B2 · Guadalupe Bridge">
+          <circle cx="0" cy="0" r="8" fill="rgba(180,100,255,0.2)" stroke="#b464ff" stroke-width="1.5"/>
+          <text x="0" y="4" text-anchor="middle" font-size="8" fill="#b464ff">📷</text>
+        </g>
+        <g transform="translate(680, 250)" class="cam-marker" data-name="CAM-C3 · Lambingan Bridge">
+          <circle cx="0" cy="0" r="8" fill="rgba(180,100,255,0.2)" stroke="#b464ff" stroke-width="1.5"/>
+          <text x="0" y="4" text-anchor="middle" font-size="8" fill="#b464ff">📷</text>
+        </g>
+      </g>
+
+      <!-- Bridge structures -->
+      <g stroke="#1a4060" stroke-width="3" fill="none" opacity="0.8">
+        <line x1="200" y1="195" x2="200" y2="365"/>
+        <line x1="450" y1="210" x2="450" y2="350"/>
+        <line x1="680" y1="205" x2="680" y2="355"/>
+      </g>
+
+      <!-- Labels -->
+      <text x="450" y="285" text-anchor="middle" font-family="'Space Mono',monospace" font-size="11" 
+            fill="rgba(0,180,255,0.5)" letter-spacing="3">PASIG RIVER</text>
+
+      <text x="90" y="195" font-family="monospace" font-size="8" fill="rgba(0,180,255,0.4)">Marikina Bridge</text>
+      <text x="335" y="200" font-family="monospace" font-size="8" fill="rgba(0,180,255,0.4)">Guadalupe</text>
+      <text x="620" y="200" font-family="monospace" font-size="8" fill="rgba(0,180,255,0.4)">Lambingan</text>
+
+      <!-- Coordinate labels -->
+      <g font-family="'Space Mono',monospace" font-size="7" fill="rgba(0,180,255,0.25)">
+        <text x="5" y="95">14.60°N</text>
+        <text x="5" y="195">14.59°N</text>
+        <text x="5" y="375">14.58°N</text>
+        <text x="5" y="495">14.57°N</text>
+        <text x="150" y="590">121.03°E</text>
+        <text x="420" y="590">121.05°E</text>
+        <text x="700" y="590">121.07°E</text>
+      </g>
+    </svg>
+
+    <!-- Alert markers on top -->
+    <div class="map-alert" style="left:14%; top:52%" id="alert1">
+      <div class="alert-ring critical" onclick="showTooltip(event, 'Marikina Confluence', 'CRITICAL', '94', '23.4t', 'Illegal dumping + storm drain overflow')">!</div>
+    </div>
+    <div class="map-alert" style="left:52%; top:60%" id="alert2">
+      <div class="alert-ring high" onclick="showTooltip(event, 'Guadalupe Riverbank', 'HIGH', '71', '12.1t', 'Industrial outfall detected')">!</div>
+    </div>
+    <div class="map-alert" style="left:76%; top:48%" id="alert3">
+      <div class="alert-ring medium" onclick="showTooltip(event, 'Lambingan Sector', 'MODERATE', '52', '8.6t', 'Residential waste accumulation')">!</div>
+    </div>
+    <div class="map-alert" style="left:35%; top:43%" id="alert4">
+      <div class="alert-ring high" onclick="showTooltip(event, 'Mandaluyong Outfall', 'HIGH', '78', '11.2t', 'Storm drain overflow · post-rain surge')">!</div>
+    </div>
+
+    <!-- Tooltip -->
+    <div class="map-tooltip" id="mapTooltip">
+      <div class="tooltip-title" id="tt-name">Marikina Confluence</div>
+      <div class="tooltip-row">
+        <span class="tooltip-key">Status</span>
+        <span class="tooltip-val" id="tt-status" style="color:var(--red)">CRITICAL</span>
+      </div>
+      <div class="tooltip-row">
+        <span class="tooltip-key">Pollution Index</span>
+        <span class="tooltip-val" id="tt-pci">94/100</span>
+      </div>
+      <div class="tooltip-row">
+        <span class="tooltip-key">Plastic Load</span>
+        <span class="tooltip-val" id="tt-load">23.4 tonnes</span>
+      </div>
+      <div class="tooltip-row" style="margin-top:4px; border-top:1px solid var(--border); padding-top:4px;">
+        <span class="tooltip-key" style="color:var(--muted); font-size:9px;" id="tt-note">Illegal dumping + storm drain overflow</span>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="map-legend">
+      <h4>🌡 Pollution Density</h4>
+      <div class="legend-bar"></div>
+      <div class="legend-labels">
+        <span>Clean</span>
+        <span>Moderate</span>
+        <span>High</span>
+        <span>Critical</span>
+      </div>
+      <div style="margin-top:8px; font-size:9px; color:var(--muted);">
+        <div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">
+          <span style="color:#ffb300;">●</span> Pollution source outfall
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;margin-bottom:2px;">
+          <span style="color:#b464ff;">📷</span> Camera node
+        </div>
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span style="color:#00b4ff;">→</span> Flow direction
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline scrubber -->
+    <div class="timeline">
+      <label>Playback</label>
+      <input type="range" min="0" max="23" value="14" id="timeSlider" oninput="updateTime(this.value)">
+      <span class="timeline-val" id="timeLabel">14:00 Today</span>
+    </div>
+
+    <!-- Coord display -->
+    <div class="map-coords" id="mapCoords">14.5847°N, 121.0244°E · Pasig River, Metro Manila</div>
+
+  </div>
+
+  <!-- RIGHT PANEL: Camera Feeds -->
+  <div class="right-panel">
+
+    <div class="cam-section">
+      <h3>📡 Live Camera Feeds
+        <span style="margin-left:auto; font-size:9px; color:var(--accent2); font-family:'DM Sans',sans-serif; font-weight:400; text-transform:none; letter-spacing:0;">AI Detection Active</span>
+      </h3>
+
+      <div class="alert-banner">
+        <span>⚠</span> High accumulation detected at CAM-A1
+      </div>
+
+      <!-- Camera A1 -->
+      <div class="cam-feed active">
+        <div class="cam-viewport">
+          <canvas id="cam1" width="276" height="155" style="width:100%;height:100%;display:block;"></canvas>
+          <div class="cam-hud">
+            <div class="rec"></div>
+            <span>REC · CAM-A1</span>
+          </div>
+          <div class="cam-bottom">
+            <span class="cam-ai-tag">AI DETECT</span>
+            <span class="cam-timestamp" id="ts1"></span>
+          </div>
+          <div class="scanlines"></div>
+        </div>
+        <div class="cam-meta">
+          <div>
+            <div class="cam-name">Marikina Bridge</div>
+            <div style="font-size:10px;color:var(--muted);">Upstream · Looking East</div>
+          </div>
+          <div class="cam-pci" style="color:var(--red)">PCI 94</div>
+        </div>
+      </div>
+
+      <!-- Camera B2 -->
+      <div class="cam-feed">
+        <div class="cam-viewport">
+          <canvas id="cam2" width="276" height="155" style="width:100%;height:100%;display:block;"></canvas>
+          <div class="cam-hud">
+            <div class="rec"></div>
+            <span>REC · CAM-B2</span>
+          </div>
+          <div class="cam-bottom">
+            <span class="cam-ai-tag">AI DETECT</span>
+            <span class="cam-timestamp" id="ts2"></span>
+          </div>
+          <div class="scanlines"></div>
+        </div>
+        <div class="cam-meta">
+          <div>
+            <div class="cam-name">Guadalupe Bridge</div>
+            <div style="font-size:10px;color:var(--muted);">Midstream · Looking West</div>
+          </div>
+          <div class="cam-pci" style="color:var(--orange)">PCI 71</div>
+        </div>
+      </div>
+
+      <!-- Camera C3 -->
+      <div class="cam-feed">
+        <div class="cam-viewport">
+          <canvas id="cam3" width="276" height="155" style="width:100%;height:100%;display:block;"></canvas>
+          <div class="cam-hud">
+            <div class="rec"></div>
+            <span>REC · CAM-C3</span>
+          </div>
+          <div class="cam-bottom">
+            <span class="cam-timestamp" id="ts3"></span>
+          </div>
+          <div class="scanlines"></div>
+        </div>
+        <div class="cam-meta">
+          <div>
+            <div class="cam-name">Lambingan Bridge</div>
+            <div style="font-size:10px;color:var(--muted);">Downstream · Looking East</div>
+          </div>
+          <div class="cam-pci" style="color:var(--yellow)">PCI 52</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Event Log -->
+    <div class="events-section">
+      <h3>⚡ AI Event Log</h3>
+      <div id="eventLog">
+        <div class="event-item">
+          <div class="event-dot" style="background:var(--red);"></div>
+          <div class="event-text"><strong>Large cluster</strong> detected · 4.2m² plastic mat · CAM-A1</div>
+          <div class="event-time">14:03</div>
+        </div>
+        <div class="event-item">
+          <div class="event-dot" style="background:var(--orange);"></div>
+          <div class="event-text">Outfall discharge spike · <strong>+340%</strong> flow rate · Sector 4</div>
+          <div class="event-time">13:58</div>
+        </div>
+        <div class="event-item">
+          <div class="event-dot" style="background:var(--yellow);"></div>
+          <div class="event-text">Floating debris accumulation · <strong>CAM-B2</strong> · 1.8m²</div>
+          <div class="event-time">13:44</div>
+        </div>
+        <div class="event-item">
+          <div class="event-dot" style="background:var(--accent);"></div>
+          <div class="event-text">IoT sensor #7 turbidity threshold exceeded · <strong>89 NTU</strong></div>
+          <div class="event-time">13:31</div>
+        </div>
+        <div class="event-item">
+          <div class="event-dot" style="background:var(--red);"></div>
+          <div class="event-text">Satellite pass confirmed <strong>critical zone</strong> near Marikina</div>
+          <div class="event-time">12:15</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOOLTIP CLOSE -->
+<script>
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.alert-ring') && !e.target.closest('#mapTooltip')) {
+    document.getElementById('mapTooltip').classList.remove('show');
+  }
+});
+
+// Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString('en-PH', {hour:'2-digit',minute:'2-digit',second:'2-digit'}) + ' PHT';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Timestamps
+function updateTimestamps() {
+  const now = new Date();
+  const ts = now.toLocaleTimeString('en-PH', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  ['ts1','ts2','ts3'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = ts;
+  });
+}
+setInterval(updateTimestamps, 1000);
+updateTimestamps();
+
+// Timeline
+function updateTime(val) {
+  const h = parseInt(val);
+  const suffix = h >= 12 ? 'PM' : 'AM';
+  const h12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+  document.getElementById('timeLabel').textContent = `${h12}:00 ${suffix} Today`;
+  drawHeatmap(val / 23);
+}
+
+// Toggle layers
+function toggleLayer(item, name) {
+  const toggle = item.querySelector('.toggle');
+  toggle.classList.toggle('on');
+  const isOn = toggle.classList.contains('on');
+
+  if (name === 'heatmap') {
+    document.getElementById('heatCanvas').style.opacity = isOn ? '0.75' : '0';
+  }
+  if (name === 'flow') {
+    document.getElementById('flowLayer').style.opacity = isOn ? '0.5' : '0';
+  }
+  if (name === 'sources') {
+    document.getElementById('sourcesLayer').style.opacity = isOn ? '1' : '0';
+  }
+  if (name === 'cameras') {
+    document.getElementById('cameraLayer').style.opacity = isOn ? '1' : '0';
+  }
+}
+
+// Tooltip
+function showTooltip(e, name, status, pci, load, note) {
+  e.stopPropagation();
+  const tt = document.getElementById('mapTooltip');
+  document.getElementById('tt-name').textContent = name;
+  document.getElementById('tt-status').textContent = status;
+  const colors = {CRITICAL:'var(--red)',HIGH:'var(--orange)',MODERATE:'var(--yellow)'};
+  document.getElementById('tt-status').style.color = colors[status] || 'var(--text)';
+  document.getElementById('tt-pci').textContent = pci + '/100';
+  document.getElementById('tt-load').textContent = load + ' tonnes';
+  document.getElementById('tt-note').textContent = note;
+
+  const rect = document.getElementById('mapContainer').getBoundingClientRect();
+  let x = e.clientX - rect.left + 15;
+  let y = e.clientY - rect.top - 80;
+  if (x + 200 > rect.width) x -= 215;
+  if (y < 0) y = 10;
+  tt.style.left = x + 'px';
+  tt.style.top = y + 'px';
+  tt.classList.add('show');
+}
+
+// Heatmap drawing
+function drawHeatmap(timeRatio) {
+  const canvas = document.getElementById('heatCanvas');
+  const map = document.getElementById('mapContainer');
+  canvas.width = map.offsetWidth;
+  canvas.height = map.offsetHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const W = canvas.width;
+  const H = canvas.height;
+
+  // Pollution hotspots (x%, y%, radius%, intensity 0-1)
+  const hotspots = [
+    { x: 0.14, y: 0.48, r: 0.09, intensity: 0.92 + Math.sin(timeRatio * 3) * 0.05 },
+    { x: 0.22, y: 0.52, r: 0.07, intensity: 0.75 },
+    { x: 0.35, y: 0.44, r: 0.06, intensity: 0.7 + timeRatio * 0.1 },
+    { x: 0.52, y: 0.58, r: 0.08, intensity: 0.68 },
+    { x: 0.47, y: 0.45, r: 0.05, intensity: 0.55 },
+    { x: 0.65, y: 0.50, r: 0.06, intensity: 0.50 },
+    { x: 0.76, y: 0.46, r: 0.05, intensity: 0.45 },
+    { x: 0.87, y: 0.51, r: 0.06, intensity: 0.55 + Math.cos(timeRatio * 2) * 0.08 },
+    { x: 0.10, y: 0.50, r: 0.04, intensity: 0.60 },
+    { x: 0.60, y: 0.55, r: 0.04, intensity: 0.62 },
+  ];
+
+  hotspots.forEach(hs => {
+    const cx = hs.x * W;
+    const cy = hs.y * H;
+    const r = hs.r * Math.min(W, H);
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+
+    const i = Math.max(0, Math.min(1, hs.intensity));
+
+    if (i > 0.8) {
+      grad.addColorStop(0, `rgba(255,30,30,${i * 0.9})`);
+      grad.addColorStop(0.3, `rgba(255,80,0,${i * 0.6})`);
+      grad.addColorStop(0.6, `rgba(255,160,0,${i * 0.3})`);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+    } else if (i > 0.6) {
+      grad.addColorStop(0, `rgba(255,120,0,${i * 0.85})`);
+      grad.addColorStop(0.4, `rgba(255,180,0,${i * 0.5})`);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+    } else if (i > 0.4) {
+      grad.addColorStop(0, `rgba(255,200,0,${i * 0.8})`);
+      grad.addColorStop(0.5, `rgba(180,220,0,${i * 0.4})`);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+    } else {
+      grad.addColorStop(0, `rgba(100,220,100,${i * 0.7})`);
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+    }
+
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+// Camera river simulations
+function drawRiver(canvasId, seed, pollutionLevel) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width;
+  const H = canvas.height;
+
+  let frame = 0;
+
+  function render() {
+    ctx.clearRect(0, 0, W, H);
+
+    // Sky / bank
+    const skyGrad = ctx.createLinearGradient(0, 0, 0, H * 0.35);
+    skyGrad.addColorStop(0, '#0a1520');
+    skyGrad.addColorStop(1, '#1a3040');
+    ctx.fillStyle = skyGrad;
+    ctx.fillRect(0, 0, W, H * 0.38);
+
+    // Bank
+    ctx.fillStyle = '#1a2830';
+    ctx.fillRect(0, H * 0.36, W, H * 0.08);
+
+    // Foliage hints
+    ctx.fillStyle = '#0f2018';
+    for (let i = 0; i < 6; i++) {
+      const bx = (seed * 80 + i * 47) % W;
+      ctx.beginPath();
+      ctx.ellipse(bx, H * 0.34, 18, 10, 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Water
+    const waterGrad = ctx.createLinearGradient(0, H * 0.42, 0, H);
+    waterGrad.addColorStop(0, '#0d2535');
+    waterGrad.addColorStop(0.5, '#091e2e');
+    waterGrad.addColorStop(1, '#061528');
+    ctx.fillStyle = waterGrad;
+    ctx.fillRect(0, H * 0.42, W, H * 0.58);
+
+    // Wave ripples
+    ctx.strokeStyle = 'rgba(0,100,180,0.25)';
+    ctx.lineWidth = 0.8;
+    for (let row = 0; row < 5; row++) {
+      const y = H * 0.48 + row * 18 + Math.sin(frame * 0.04 + row) * 2;
+      ctx.beginPath();
+      for (let x = -20; x < W + 20; x += 3) {
+        const wy = y + Math.sin((x + frame * 2) * 0.08) * 1.5;
+        x === -20 ? ctx.moveTo(x, wy) : ctx.lineTo(x, wy);
+      }
+      ctx.stroke();
+    }
+
+    // Floating plastic debris
+    const numDebris = Math.floor(pollutionLevel * 25) + 5;
+    for (let i = 0; i < numDebris; i++) {
+      const dx = ((seed * 13 + i * 37 + frame * 0.8) % (W + 40)) - 20;
+      const dy = H * 0.50 + (seed * 7 + i * 19) % (H * 0.4);
+      const size = 2 + (i % 4);
+
+      // Color varies: bottles, bags, foam
+      const debrisColors = ['rgba(220,200,160,0.8)','rgba(255,255,255,0.6)','rgba(180,220,200,0.7)','rgba(100,180,220,0.6)'];
+      ctx.fillStyle = debrisColors[i % debrisColors.length];
+
+      ctx.save();
+      ctx.translate(dx, dy);
+      ctx.rotate(Math.sin(frame * 0.02 + i) * 0.3);
+
+      if (i % 3 === 0) {
+        // Bottle shape
+        ctx.beginPath();
+        ctx.ellipse(0, 0, size * 1.5, size * 0.7, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else if (i % 3 === 1) {
+        // Bag / irregular
+        ctx.beginPath();
+        ctx.moveTo(-size, 0);
+        ctx.quadraticCurveTo(-size/2, -size, size/2, -size/2);
+        ctx.quadraticCurveTo(size, size/2, 0, size);
+        ctx.closePath();
+        ctx.fill();
+      } else {
+        ctx.fillRect(-size, -size/2, size * 2, size);
+      }
+      ctx.restore();
+
+      // Reflection
+      ctx.fillStyle = 'rgba(255,255,255,0.08)';
+      ctx.fillRect(dx - size/2, dy + size + 1, size, 1);
+    }
+
+    // Foam / scum line at high pollution
+    if (pollutionLevel > 0.65) {
+      ctx.fillStyle = `rgba(200,200,180,${pollutionLevel * 0.35})`;
+      for (let fi = 0; fi < 8; fi++) {
+        const fx = ((seed * 31 + fi * 60 + frame * 0.5) % W);
+        const fy = H * 0.50 + fi * 8;
+        ctx.beginPath();
+        ctx.ellipse(fx, fy, 15 + fi * 3, 2, Math.sin(frame * 0.01) * 0.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Light reflection from city
+    const lightGrad = ctx.createLinearGradient(W * 0.3, H * 0.42, W * 0.7, H * 0.55);
+    lightGrad.addColorStop(0, 'rgba(0,100,180,0)');
+    lightGrad.addColorStop(0.5, `rgba(0,120,200,${0.06 + Math.sin(frame*0.05)*0.02})`);
+    lightGrad.addColorStop(1, 'rgba(0,100,180,0)');
+    ctx.fillStyle = lightGrad;
+    ctx.fillRect(0, H * 0.42, W, H * 0.3);
+
+    // Camera noise
+    if (Math.random() > 0.97) {
+      ctx.fillStyle = 'rgba(255,255,255,0.03)';
+      ctx.fillRect(0, Math.random() * H, W, 1);
+    }
+
+    frame++;
+    requestAnimationFrame(render);
+  }
+
+  render();
+}
+
+// Heatmap resize
+window.addEventListener('resize', () => drawHeatmap(0.6));
+
+// Init
+window.addEventListener('load', () => {
+  drawHeatmap(0.6);
+  drawRiver('cam1', 1, 0.92);
+  drawRiver('cam2', 5, 0.70);
+  drawRiver('cam3', 9, 0.50);
+});
+
+// Animate live stats
+setInterval(() => {
+  const base = 47.3;
+  const val = (base + (Math.random() - 0.5) * 0.4).toFixed(1);
+  document.getElementById('totalTons').textContent = val + 't';
+}, 4000);
+
+// Add live events
+const eventMessages = [
+  ['var(--red)', 'Plastic cluster expanding · <strong>+18%</strong> vs last hour · CAM-A1', 'red'],
+  ['var(--orange)', 'Flow velocity drop detected · debris accumulation risk · <strong>Sector 2</strong>', 'orange'],
+  ['var(--yellow)', 'Satellite imagery updated · <strong>new hotspot</strong> near Mandaluyong', 'yellow'],
+  ['var(--accent)', 'IoT sensor #3 online · pH 6.8 · <strong>acidic</strong> reading', 'accent'],
+  ['var(--accent2)', 'Survey team data synced · <strong>12 stations</strong> refreshed', 'green'],
+];
+
+let eventIdx = 0;
+setInterval(() => {
+  const log = document.getElementById('eventLog');
+  const msg = eventMessages[eventIdx % eventMessages.length];
+  eventIdx++;
+
+  const now = new Date();
+  const time = now.toLocaleTimeString('en-PH', {hour:'2-digit',minute:'2-digit'});
+
+  const item = document.createElement('div');
+  item.className = 'event-item';
+  item.innerHTML = `
+    <div class="event-dot" style="background:${msg[0]};"></div>
+    <div class="event-text">${msg[1]}</div>
+    <div class="event-time">${time}</div>
+  `;
+  log.insertBefore(item, log.firstChild);
+  if (log.children.length > 8) log.removeChild(log.lastChild);
+}, 8000);
+</script>
+</body>
+</html>
