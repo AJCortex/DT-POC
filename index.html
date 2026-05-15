@@ -10,17 +10,13 @@
 <style>
   :root {
     --bone: #EAEFES;
-    --bone-2: #D8DED0;
     --ink: #171513;
     --ink-2: #3A332E;
     --ink-3: #6A5F55;
-    --rule: #D0CBFB;
     --accent: #4A3B8A;
     --accent-soft: #7B6DB8;
     --card-bg: #F5F2ED;
     --card-border: rgba(74,59,138,0.12);
-    --glow-1: rgba(74,59,138,0.06);
-    --glow-2: rgba(0,180,120,0.05);
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -36,7 +32,6 @@
     overflow-x: hidden;
   }
 
-  /* Grain overlay */
   body::before {
     content: '';
     position: fixed;
@@ -48,7 +43,6 @@
     background-size: 200px;
   }
 
-  /* Subtle background blobs */
   body::after {
     content: '';
     position: fixed;
@@ -68,7 +62,6 @@
     flex-direction: column;
   }
 
-  /* HEADER */
   header {
     display: flex;
     align-items: center;
@@ -86,14 +79,10 @@
   .wordmark-icon {
     width: 32px;
     height: 32px;
-    position: relative;
     flex-shrink: 0;
   }
 
-  .wordmark-icon svg {
-    width: 100%;
-    height: 100%;
-  }
+  .wordmark-icon svg { width: 100%; height: 100%; }
 
   .wordmark-text {
     display: flex;
@@ -116,7 +105,6 @@
     font-size: 11px;
     color: var(--ink-3);
     font-weight: 300;
-    letter-spacing: 0.01em;
   }
 
   .header-right {
@@ -130,19 +118,14 @@
   }
 
   .live-pip {
-    width: 6px;
-    height: 6px;
+    width: 6px; height: 6px;
     border-radius: 50%;
     background: #2DBE7C;
     animation: pip 2.5s ease-in-out infinite;
   }
 
-  @keyframes pip {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
+  @keyframes pip { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  /* HERO */
   .hero {
     padding: 80px 48px 60px;
     max-width: 860px;
@@ -179,20 +162,15 @@
     margin-bottom: 24px;
   }
 
-  .hero-title em {
-    font-style: italic;
-    color: var(--accent);
-  }
+  .hero-title em { font-style: italic; color: var(--accent); }
 
   .hero-sub {
     font-size: 15px;
     color: var(--ink-3);
     max-width: 520px;
     line-height: 1.65;
-    font-weight: 400;
   }
 
-  /* DIVIDER */
   .section-rule {
     display: flex;
     align-items: center;
@@ -216,7 +194,6 @@
     background: rgba(23,21,19,0.1);
   }
 
-  /* CARDS GRID */
   .cards {
     padding: 0 48px 80px;
     display: grid;
@@ -234,7 +211,6 @@
     text-decoration: none;
     color: inherit;
     transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-    position: relative;
   }
 
   .card:hover {
@@ -243,11 +219,8 @@
     border-color: rgba(74,59,138,0.25);
   }
 
-  .card:hover .card-arrow {
-    transform: translate(3px, -3px);
-  }
+  .card:hover .card-arrow { transform: translate(3px, -3px); }
 
-  /* Card preview area */
   .card-preview {
     height: 220px;
     position: relative;
@@ -255,31 +228,9 @@
     flex-shrink: 0;
   }
 
-  /* Alameda Gardens - warm earthy */
-  .card-preview.alameda {
-    background: #0C1208;
-  }
+  .card-preview.alameda { background: #0C1208; }
+  .card-preview.pasig { background: #070d14; }
 
-  .alameda-canvas {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    inset: 0;
-  }
-
-  /* Pasig - dark teal */
-  .card-preview.pasig {
-    background: #070d14;
-  }
-
-  .pasig-canvas {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    inset: 0;
-  }
-
-  /* COMING SOON card */
   .card-preview.tba {
     background: #F0EDE6;
     display: flex;
@@ -287,16 +238,8 @@
     justify-content: center;
   }
 
-  .tba-inner {
-    text-align: center;
-  }
-
-  .tba-icon {
-    font-size: 32px;
-    margin-bottom: 10px;
-    opacity: 0.25;
-  }
-
+  .tba-inner { text-align: center; }
+  .tba-icon { font-size: 32px; margin-bottom: 10px; opacity: 0.25; }
   .tba-label {
     font-family: 'Geist Mono', monospace;
     font-size: 10px;
@@ -305,7 +248,6 @@
     color: var(--ink-3);
   }
 
-  /* Card body */
   .card-body {
     padding: 24px 26px 22px;
     flex: 1;
@@ -320,11 +262,7 @@
     justify-content: space-between;
   }
 
-  .card-tags {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-  }
+  .card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
 
   .tag {
     font-family: 'Geist Mono', monospace;
@@ -353,8 +291,7 @@
   }
 
   .card-live-dot {
-    width: 5px;
-    height: 5px;
+    width: 5px; height: 5px;
     border-radius: 50%;
     background: #2DBE7C;
     animation: pip 2.5s ease-in-out infinite;
@@ -369,10 +306,7 @@
     color: var(--ink);
   }
 
-  .card-title em {
-    font-style: italic;
-    color: var(--accent);
-  }
+  .card-title em { font-style: italic; color: var(--accent); }
 
   .card-desc {
     font-size: 13px;
@@ -400,8 +334,7 @@
   }
 
   .card-arrow {
-    width: 28px;
-    height: 28px;
+    width: 28px; height: 28px;
     border-radius: 50%;
     background: var(--ink);
     display: flex;
@@ -412,8 +345,7 @@
   }
 
   .card-arrow svg {
-    width: 12px;
-    height: 12px;
+    width: 12px; height: 12px;
     stroke: #EAEEE8;
     fill: none;
     stroke-width: 2;
@@ -421,7 +353,6 @@
     stroke-linejoin: round;
   }
 
-  /* FOOTER */
   footer {
     margin-top: auto;
     padding: 28px 48px;
@@ -431,20 +362,9 @@
     justify-content: space-between;
   }
 
-  .footer-left {
-    font-size: 12px;
-    color: var(--ink-3);
-  }
-
-  .footer-left a {
-    color: var(--accent);
-    text-decoration: none;
-    font-weight: 500;
-  }
-
-  .footer-left a:hover {
-    text-decoration: underline;
-  }
+  .footer-left { font-size: 12px; color: var(--ink-3); }
+  .footer-left a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .footer-left a:hover { text-decoration: underline; }
 
   .footer-right {
     font-family: 'Geist Mono', monospace;
@@ -453,26 +373,19 @@
     letter-spacing: 0.06em;
   }
 
-  /* ANIMATIONS */
   .fade-up {
     opacity: 0;
     transform: translateY(18px);
     animation: fadeUp 0.7s ease forwards;
   }
 
-  @keyframes fadeUp {
-    to { opacity: 1; transform: translateY(0); }
-  }
-
+  @keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
   .fade-up:nth-child(1) { animation-delay: 0.05s; }
   .fade-up:nth-child(2) { animation-delay: 0.15s; }
   .fade-up:nth-child(3) { animation-delay: 0.25s; }
 
   @media (max-width: 700px) {
-    header, .hero, .section-rule, .cards, footer {
-      padding-left: 24px;
-      padding-right: 24px;
-    }
+    header, .hero, .section-rule, .cards, footer { padding-left: 24px; padding-right: 24px; }
     .hero { padding-top: 48px; padding-bottom: 40px; }
     .cards { grid-template-columns: 1fr; }
     .hero-title { font-size: 36px; }
@@ -480,9 +393,38 @@
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <!-- HEADER -->
+<!-- PASSWORD GATE -->
+<div id="gate" style="position:fixed;inset:0;z-index:9999;background:#0d0d0b;display:flex;align-items:center;justify-content:center;font-family:'Inter Tight',system-ui,sans-serif;">
+  <div style="text-align:center;max-width:320px;width:90%;">
+    <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#6A5F55;margin-bottom:32px;font-family:'Geist Mono',monospace;">Twin Axis Studio · Demo Portal</div>
+    <div style="font-family:'Fraunces',Georgia,serif;font-size:28px;font-weight:300;font-style:italic;color:#EAEEE8;margin-bottom:8px;letter-spacing:-0.01em;">Access Required</div>
+    <div style="font-size:13px;color:#6A5F55;margin-bottom:32px;">Enter your access code to continue.</div>
+    <input id="gateInput" type="password" placeholder="Access code" autocomplete="off" style="width:100%;padding:14px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#EAEEE8;font-size:14px;outline:none;text-align:center;letter-spacing:0.1em;font-family:'Geist Mono',monospace;transition:border-color 0.2s;" onkeydown="if(event.key==='Enter')checkPass()" onfocus="this.style.borderColor='rgba(74,59,138,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"/>
+    <div id="gateError" style="font-size:11px;color:#ff5555;margin-top:10px;opacity:0;transition:opacity 0.2s;height:16px;">Incorrect access code.</div>
+    <button onclick="checkPass()" style="margin-top:16px;width:100%;padding:14px;background:#4A3B8A;border:none;border-radius:8px;color:#EAEEE8;font-size:13px;font-weight:500;letter-spacing:0.06em;cursor:pointer;font-family:'Inter Tight',sans-serif;transition:background 0.2s;" onmouseover="this.style.background='#5B4AA0'" onmouseout="this.style.background='#4A3B8A'">Enter</button>
+  </div>
+</div>
+<script>
+  (function(){if(sessionStorage.getItem('ta_auth')==='1'){document.getElementById('gate').style.display='none';}})();
+  function checkPass(){
+    const val=document.getElementById('gateInput').value;
+    if(val==='BuildFast'){
+      sessionStorage.setItem('ta_auth','1');
+      const gate=document.getElementById('gate');
+      gate.style.transition='opacity 0.4s';gate.style.opacity='0';
+      setTimeout(()=>gate.style.display='none',400);
+    } else {
+      const err=document.getElementById('gateError');
+      err.style.opacity='1';
+      document.getElementById('gateInput').style.borderColor='rgba(255,80,80,0.5)';
+      setTimeout(()=>{err.style.opacity='0';document.getElementById('gateInput').style.borderColor='rgba(255,255,255,0.1)';},2500);
+    }
+  }
+</script>
+<!-- END GATE -->
+
+<div class="wrap">
   <header>
     <div class="wordmark">
       <div class="wordmark-icon">
@@ -504,14 +446,12 @@
     </div>
   </header>
 
-  <!-- HERO -->
   <section class="hero">
     <div class="hero-eyebrow">Active Demonstrations</div>
     <h1 class="hero-title">Digital twins.<br><em>Built to decide.</em></h1>
     <p class="hero-sub">Live operational models combining real-time data, AI assistive intelligence, and spatial visualization. Select a demo below to explore.</p>
   </section>
 
-  <!-- CARDS -->
   <div class="section-rule">
     <span class="section-rule-label">Pilot Projects</span>
     <div class="section-rule-line"></div>
@@ -519,10 +459,9 @@
 
   <div class="cards">
 
-    <!-- Alameda Gardens -->
-    <a class="card fade-up" href="/alameda" target="_blank">
+    <a class="card fade-up" href="/alameda/" target="_blank">
       <div class="card-preview alameda">
-        <canvas class="alameda-canvas" id="alamedaCanvas"></canvas>
+        <canvas id="alamedaCanvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
       </div>
       <div class="card-body">
         <div class="card-meta">
@@ -531,19 +470,13 @@
             <span class="tag tag-re">Real Estate</span>
             <span class="tag tag-iot">IoT</span>
           </div>
-          <div class="card-live">
-            <div class="card-live-dot"></div>
-            Live
-          </div>
+          <div class="card-live"><div class="card-live-dot"></div>Live</div>
         </div>
         <div class="card-title">Alameda <em>Gardens</em></div>
         <div class="card-desc">Operational property twin for a 24-unit residential building. AppFolio-bridged live data, AI-assisted leasing intelligence, and unit-level occupancy modeling.</div>
         <div class="card-footer">
           <div class="card-location">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="5" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/>
-              <path d="M5 10 C5 10 1.5 6.5 1.5 4 C1.5 2.07 3.07 0.5 5 0.5 C6.93 0.5 8.5 2.07 8.5 4 C8.5 6.5 5 10 5 10Z" stroke="currentColor" stroke-width="1.2" fill="none"/>
-            </svg>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M5 10C5 10 1.5 6.5 1.5 4C1.5 2.07 3.07.5 5 .5C6.93.5 8.5 2.07 8.5 4C8.5 6.5 5 10 5 10Z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
             Pilot · PV Management Co.
           </div>
           <div class="card-arrow">
@@ -553,10 +486,9 @@
       </div>
     </a>
 
-    <!-- Pasig River -->
-    <a class="card fade-up" href="/pasig" target="_blank">
+    <a class="card fade-up" href="/pasig/" target="_blank">
       <div class="card-preview pasig">
-        <canvas class="pasig-canvas" id="pasigCanvas"></canvas>
+        <canvas id="pasigCanvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
       </div>
       <div class="card-body">
         <div class="card-meta">
@@ -565,19 +497,13 @@
             <span class="tag tag-env">Environmental</span>
             <span class="tag tag-iot">IoT</span>
           </div>
-          <div class="card-live">
-            <div class="card-live-dot"></div>
-            Live
-          </div>
+          <div class="card-live"><div class="card-live-dot"></div>Live</div>
         </div>
         <div class="card-title">Pasig River <em>Monitor</em></div>
         <div class="card-desc">Real-time plastic pollution digital twin for Metro Manila's Pasig River corridor. Satellite imagery, IoT sensor fusion, flow modeling, and hotspot classification across 25km.</div>
         <div class="card-footer">
           <div class="card-location">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="5" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/>
-              <path d="M5 10 C5 10 1.5 6.5 1.5 4 C1.5 2.07 3.07 0.5 5 0.5 C6.93 0.5 8.5 2.07 8.5 4 C8.5 6.5 5 10 5 10Z" stroke="currentColor" stroke-width="1.2" fill="none"/>
-            </svg>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M5 10C5 10 1.5 6.5 1.5 4C1.5 2.07 3.07.5 5 .5C6.93.5 8.5 2.07 8.5 4C8.5 6.5 5 10 5 10Z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
             Metro Manila, Philippines
           </div>
           <div class="card-arrow">
@@ -587,19 +513,16 @@
       </div>
     </a>
 
-    <!-- Coming Soon -->
-    <div class="card fade-up" style="cursor:default; opacity:0.6;">
+    <div class="card fade-up" style="cursor:default;opacity:0.6;">
       <div class="card-preview tba">
         <div class="tba-inner">
-          <div class="tba-icon">◎</div>
+          <div class="tba-icon">&#9678;</div>
           <div class="tba-label">In Development</div>
         </div>
       </div>
       <div class="card-body">
         <div class="card-meta">
-          <div class="card-tags">
-            <span class="tag tag-dt">Digital Twin</span>
-          </div>
+          <div class="card-tags"><span class="tag tag-dt">Digital Twin</span></div>
         </div>
         <div class="card-title">Next <em>Pilot</em></div>
         <div class="card-desc">A new operational model is in development. Contact Twin Axis Studio to discuss your project or request early access to an upcoming demo.</div>
@@ -611,256 +534,111 @@
 
   </div>
 
-  <!-- FOOTER -->
   <footer>
     <div class="footer-left">
-      &copy; 2026 <a href="https://twinaxisstudio.com" target="_blank">Twin Axis Studio</a> &mdash; Confidential pilot demonstrations. Not for distribution.
+      &copy; 2026 <a href="https://twinaxisstudio.com" target="_blank">Twin Axis Studio</a> &nbsp;&middot;&nbsp; Confidential pilot demonstrations. Not for distribution.
     </div>
     <div class="footer-right" id="footerDate"></div>
   </footer>
-
 </div>
 
 <script>
-// Footer date
 document.getElementById('footerDate').textContent =
-  new Date().toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' }).toUpperCase();
+  new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase();
 
-// Alameda canvas -- warm property dashboard feel
-(function() {
+// Alameda canvas preview
+(function(){
   const canvas = document.getElementById('alamedaCanvas');
-  if (!canvas) return;
+  if(!canvas) return;
   const ctx = canvas.getContext('2d');
   let frame = 0;
-
-  function resize() {
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-  }
+  function resize(){ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight; }
   resize();
-
-  const unitData = Array.from({length:24}, (_, i) => ({
-    status: ['occupied','occupied','occupied','vacant','in-turn'][Math.floor(Math.random()*5)] ,
-    rent: 1800 + Math.floor(Math.random()*600),
-    floor: Math.floor(i/6) + 1,
-    unit: i % 6 + 1
-  }));
-
-  const statusColors = {
-    'occupied': '#4A7C59',
-    'vacant': '#8A3A2A',
-    'in-turn': '#7A6A2A',
-  };
-
-  function draw() {
-    const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0, 0, W, H);
-
-    // BG
-    const bg = ctx.createLinearGradient(0, 0, W, H);
-    bg.addColorStop(0, '#0C1208');
-    bg.addColorStop(1, '#0F1A0A');
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
-
-    // Grid lines
-    ctx.strokeStyle = 'rgba(180,200,160,0.05)';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < W; x += 40) {
-      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
-    }
-    for (let y = 0; y < H; y += 40) {
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
-    }
-
-    // Occupancy trend line (animated)
-    const pts = 20;
-    const padX = 30, padY = 30;
-    const chartW = W - padX * 2;
-    const chartH = H * 0.35;
-    const chartY = H - chartH - 20;
-
-    ctx.strokeStyle = 'rgba(74,124,89,0.4)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([4, 4]);
+  const statusColors = {'occupied':'#4A7C59','vacant':'#8A3A2A','in-turn':'#7A6A2A'};
+  const unitStates = Array.from({length:24},(_,i)=>['occupied','occupied','occupied','vacant','in-turn'][Math.floor((i*7+3)%5)]);
+  function draw(){
+    const W=canvas.width, H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+    const bg=ctx.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0,'#0C1208'); bg.addColorStop(1,'#0F1A0A');
+    ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(180,200,160,0.05)'; ctx.lineWidth=1;
+    for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    const pts=20,padX=30,chartH=H*0.35,chartY=H-chartH-20,chartW=W-padX*2;
+    const grad=ctx.createLinearGradient(0,chartY,0,H);
+    grad.addColorStop(0,'rgba(74,124,89,0.35)'); grad.addColorStop(1,'rgba(74,124,89,0)');
     ctx.beginPath();
-    ctx.moveTo(padX, chartY);
-    ctx.lineTo(W - padX, chartY);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    const grad = ctx.createLinearGradient(0, chartY, 0, H);
-    grad.addColorStop(0, 'rgba(74,124,89,0.35)');
-    grad.addColorStop(1, 'rgba(74,124,89,0)');
-
+    for(let i=0;i<=pts;i++){const x=padX+(i/pts)*chartW;const noise=Math.sin(i*0.8+frame*0.02)*12+Math.sin(i*0.3+frame*0.01)*6;const y=chartY+H*0.08+noise;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.lineTo(W-padX,H);ctx.lineTo(padX,H);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
     ctx.beginPath();
-    for (let i = 0; i <= pts; i++) {
-      const x = padX + (i / pts) * chartW;
-      const noise = Math.sin(i * 0.8 + frame * 0.02) * 12 + Math.sin(i * 0.3 + frame * 0.01) * 6;
-      const y = chartY + H * 0.08 + noise;
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    ctx.lineTo(W - padX, H);
-    ctx.lineTo(padX, H);
-    ctx.closePath();
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    ctx.beginPath();
-    for (let i = 0; i <= pts; i++) {
-      const x = padX + (i / pts) * chartW;
-      const noise = Math.sin(i * 0.8 + frame * 0.02) * 12 + Math.sin(i * 0.3 + frame * 0.01) * 6;
-      const y = chartY + H * 0.08 + noise;
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    ctx.strokeStyle = '#4A7C59';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Unit grid
-    const cols = 6, rows = 4;
-    const cellW = 28, cellH = 18;
-    const startX = 30, startY = 24;
-    const gap = 4;
-
-    unitData.forEach((u, i) => {
-      const col = i % cols;
-      const row = Math.floor(i / cols);
-      const x = startX + col * (cellW + gap);
-      const y = startY + row * (cellH + gap);
-      const color = statusColors[u.status] || '#3A3A3A';
-      const alpha = 0.5 + Math.sin(frame * 0.03 + i * 0.4) * 0.15;
-      ctx.fillStyle = color.replace(')', `,${alpha})`).replace('rgb', 'rgba').replace('#', '');
-
-      // Simple rect fill using hex
-      ctx.globalAlpha = alpha;
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.roundRect(x, y, cellW, cellH, 3);
-      ctx.fill();
-      ctx.globalAlpha = 1;
+    for(let i=0;i<=pts;i++){const x=padX+(i/pts)*chartW;const noise=Math.sin(i*0.8+frame*0.02)*12+Math.sin(i*0.3+frame*0.01)*6;const y=chartY+H*0.08+noise;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.strokeStyle='#4A7C59';ctx.lineWidth=2;ctx.stroke();
+    const cols=6,cellW=28,cellH=18,startX=30,startY=24,gap=4;
+    unitStates.forEach((s,i)=>{
+      const col=i%cols,row=Math.floor(i/cols);
+      const x=startX+col*(cellW+gap),y=startY+row*(cellH+gap);
+      const color=statusColors[s]||'#3A3A3A';
+      const alpha=0.5+Math.sin(frame*0.03+i*0.4)*0.15;
+      ctx.globalAlpha=alpha;ctx.fillStyle=color;
+      ctx.beginPath();ctx.roundRect(x,y,cellW,cellH,3);ctx.fill();ctx.globalAlpha=1;
     });
-
-    // Label
-    ctx.fillStyle = 'rgba(180,200,160,0.5)';
-    ctx.font = '10px "Geist Mono", monospace';
-    ctx.fillText('OCCUPANCY · 24 UNITS', 30, H - 12);
-
-    const pct = Math.round(87 + Math.sin(frame * 0.015) * 2);
-    ctx.fillStyle = '#4A7C59';
-    ctx.font = 'bold 11px "Geist Mono", monospace';
-    ctx.fillText(pct + '%', W - 46, H - 12);
-
-    frame++;
-    requestAnimationFrame(draw);
+    ctx.fillStyle='rgba(180,200,160,0.5)';ctx.font='10px "Geist Mono",monospace';ctx.fillText('OCCUPANCY · 24 UNITS',30,H-12);
+    const pct=Math.round(87+Math.sin(frame*0.015)*2);
+    ctx.fillStyle='#4A7C59';ctx.font='bold 11px "Geist Mono",monospace';ctx.fillText(pct+'%',W-46,H-12);
+    frame++;requestAnimationFrame(draw);
   }
-
   draw();
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize',resize);
 })();
 
-// Pasig canvas -- river/water feel
-(function() {
-  const canvas = document.getElementById('pasigCanvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let frame = 0;
-
-  function resize() {
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-  }
+// Pasig canvas preview
+(function(){
+  const canvas=document.getElementById('pasigCanvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  let frame=0;
+  function resize(){canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;}
   resize();
-
-  function draw() {
-    const W = canvas.width, H = canvas.height;
-    ctx.clearRect(0, 0, W, H);
-
-    // BG
-    ctx.fillStyle = '#070d14';
-    ctx.fillRect(0, 0, W, H);
-
-    // River band
-    const riverY = H * 0.38;
-    const riverH = H * 0.32;
-    const riverGrad = ctx.createLinearGradient(0, riverY, 0, riverY + riverH);
-    riverGrad.addColorStop(0, '#0d2535');
-    riverGrad.addColorStop(1, '#071828');
-    ctx.fillStyle = riverGrad;
-    ctx.fillRect(0, riverY, W, riverH);
-
-    // Wave lines
-    for (let row = 0; row < 5; row++) {
-      const y = riverY + 14 + row * 14 + Math.sin(frame * 0.04 + row * 1.2) * 2;
+  function draw(){
+    const W=canvas.width,H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#070d14';ctx.fillRect(0,0,W,H);
+    const riverY=H*0.38,riverH=H*0.32;
+    const rg=ctx.createLinearGradient(0,riverY,0,riverY+riverH);
+    rg.addColorStop(0,'#0d2535');rg.addColorStop(1,'#071828');
+    ctx.fillStyle=rg;ctx.fillRect(0,riverY,W,riverH);
+    for(let row=0;row<5;row++){
+      const y=riverY+14+row*14+Math.sin(frame*0.04+row*1.2)*2;
       ctx.beginPath();
-      for (let x = 0; x <= W; x += 3) {
-        const wy = y + Math.sin((x + frame * 1.5) * 0.07) * 2.5;
-        x === 0 ? ctx.moveTo(x, wy) : ctx.lineTo(x, wy);
-      }
-      ctx.strokeStyle = `rgba(0,140,200,${0.12 - row * 0.015})`;
-      ctx.lineWidth = 1;
-      ctx.stroke();
+      for(let x=0;x<=W;x+=3){const wy=y+Math.sin((x+frame*1.5)*0.07)*2.5;x===0?ctx.moveTo(x,wy):ctx.lineTo(x,wy);}
+      ctx.strokeStyle=`rgba(0,140,200,${0.12-row*0.015})`;ctx.lineWidth=1;ctx.stroke();
     }
-
-    // Pollution hotspots (glowing dots)
-    const hotspots = [
-      {x:0.12, y:0.50, r:0.06, c:'255,40,40', i:0.85},
-      {x:0.28, y:0.48, r:0.05, c:'255,120,0', i:0.72},
-      {x:0.48, y:0.52, r:0.04, c:'255,180,0', i:0.60},
-      {x:0.67, y:0.49, r:0.04, c:'255,200,0', i:0.50},
-      {x:0.85, y:0.51, r:0.05, c:'255,80,0', i:0.65},
-    ];
-
-    hotspots.forEach(hs => {
-      const cx = hs.x * W;
-      const cy = hs.y * H;
-      const r = hs.r * Math.min(W, H);
-      const pulse = hs.i + Math.sin(frame * 0.04) * 0.08;
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      g.addColorStop(0, `rgba(${hs.c},${Math.min(pulse,1) * 0.8})`);
-      g.addColorStop(0.5, `rgba(${hs.c},${pulse * 0.3})`);
-      g.addColorStop(1, `rgba(${hs.c},0)`);
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fill();
+    [{x:0.12,y:0.50,r:0.06,c:'255,40,40',i:0.85},{x:0.28,y:0.48,r:0.05,c:'255,120,0',i:0.72},
+     {x:0.48,y:0.52,r:0.04,c:'255,180,0',i:0.60},{x:0.67,y:0.49,r:0.04,c:'255,200,0',i:0.50},
+     {x:0.85,y:0.51,r:0.05,c:'255,80,0',i:0.65}].forEach(hs=>{
+      const cx=hs.x*W,cy=hs.y*H,r=hs.r*Math.min(W,H),pulse=hs.i+Math.sin(frame*0.04)*0.08;
+      const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+      g.addColorStop(0,`rgba(${hs.c},${Math.min(pulse,1)*0.8})`);
+      g.addColorStop(0.5,`rgba(${hs.c},${pulse*0.3})`);
+      g.addColorStop(1,`rgba(${hs.c},0)`);
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();
     });
-
-    // Floating debris
-    for (let i = 0; i < 18; i++) {
-      const dx = ((i * 47 + frame * 0.7) % (W + 30)) - 15;
-      const dy = riverY + 10 + (i * 19 % (riverH - 20));
-      const sz = 2 + (i % 3);
-      ctx.fillStyle = `rgba(200,190,160,${0.4 + (i%3)*0.1})`;
-      ctx.beginPath();
-      ctx.ellipse(dx, dy, sz*1.4, sz*0.6, Math.sin(frame*0.02+i)*0.4, 0, Math.PI*2);
-      ctx.fill();
+    for(let i=0;i<18;i++){
+      const dx=((i*47+frame*0.7)%(W+30))-15,dy=riverY+10+(i*19%(riverH-20)),sz=2+(i%3);
+      ctx.fillStyle=`rgba(200,190,160,${0.4+(i%3)*0.1})`;
+      ctx.beginPath();ctx.ellipse(dx,dy,sz*1.4,sz*0.6,Math.sin(frame*0.02+i)*0.4,0,Math.PI*2);ctx.fill();
     }
-
-    // Scan line
-    const scanY = (frame * 1.2) % H;
-    const scanGrad = ctx.createLinearGradient(0, scanY - 30, 0, scanY + 30);
-    scanGrad.addColorStop(0, 'rgba(0,180,255,0)');
-    scanGrad.addColorStop(0.5, 'rgba(0,180,255,0.06)');
-    scanGrad.addColorStop(1, 'rgba(0,180,255,0)');
-    ctx.fillStyle = scanGrad;
-    ctx.fillRect(0, scanY - 30, W, 60);
-
-    // Status label
-    ctx.fillStyle = 'rgba(255,80,80,0.8)';
-    ctx.font = '10px "Geist Mono", monospace';
-    ctx.fillText('CRITICAL  47.3t / DAY', 18, H - 12);
-
-    ctx.fillStyle = 'rgba(0,180,255,0.5)';
-    ctx.font = '10px "Geist Mono", monospace';
-    ctx.fillText('25KM CORRIDOR', W - 100, H - 12);
-
-    frame++;
-    requestAnimationFrame(draw);
+    const scanY=(frame*1.2)%H;
+    const sg=ctx.createLinearGradient(0,scanY-30,0,scanY+30);
+    sg.addColorStop(0,'rgba(0,180,255,0)');sg.addColorStop(0.5,'rgba(0,180,255,0.06)');sg.addColorStop(1,'rgba(0,180,255,0)');
+    ctx.fillStyle=sg;ctx.fillRect(0,scanY-30,W,60);
+    ctx.fillStyle='rgba(255,80,80,0.8)';ctx.font='10px "Geist Mono",monospace';ctx.fillText('CRITICAL  47.3t / DAY',18,H-12);
+    ctx.fillStyle='rgba(0,180,255,0.5)';ctx.font='10px "Geist Mono",monospace';ctx.fillText('25KM CORRIDOR',W-100,H-12);
+    frame++;requestAnimationFrame(draw);
   }
-
   draw();
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize',resize);
 })();
 </script>
 </body>
