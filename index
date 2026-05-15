@@ -1,0 +1,1361 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1440, initial-scale=1" />
+<title>Operational Digital Twin — Pilot Demo · Alameda Gardens</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Geist+Mono:wght@400;500;600&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+  :root{
+    --bone:#F4EFE5;
+    --bone-2:#EDE6D7;
+    --bone-3:#E2D9C4;
+    --ink:#191513;
+    --ink-2:#3A332E;
+    --ink-3:#6F655C;
+    --ink-4:#9A8E82;
+    --rule:#CDBFA8;
+    --rule-2:#B9A88D;
+    --accent:#B9562A;        /* rust */
+    --accent-soft:#E5B79A;
+    --moss:#6E7F57;           /* occupied */
+    --amber:#C38A2E;          /* in-turn */
+    --rose:#A74834;           /* delinquent */
+    --slate:#486178;          /* work-order */
+    --ghost:#C7BCA5;          /* vacant */
+    --shadow: 0 1px 0 rgba(25,21,19,.04), 0 8px 24px rgba(25,21,19,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;height:100%;width:100%;background:var(--bone);color:var(--ink);font-family:"Inter Tight", system-ui, sans-serif;font-size:13px;line-height:1.45;-webkit-font-smoothing:antialiased;overflow:hidden}
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:100;
+    background:
+      radial-gradient(ellipse at top, transparent 60%, rgba(25,21,19,.06)),
+      radial-gradient(ellipse at bottom, transparent 70%, rgba(25,21,19,.04));
+    mix-blend-mode:multiply;
+  }
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:101;opacity:.035;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  }
+  .font-serif{font-family:"Fraunces", Georgia, serif;font-variation-settings:"opsz" 144, "SOFT" 50;font-feature-settings:"ss01" on;}
+  .font-mono{font-family:"Geist Mono", "JetBrains Mono", ui-monospace, monospace;}
+
+  /* Layout */
+  #app{
+    display:grid;
+    grid-template-rows: 62px 1fr 260px;
+    grid-template-columns: 340px 1fr 360px;
+    grid-template-areas:
+      "head head head"
+      "ai stage detail"
+      "ai bottom detail";
+    height:100vh;width:100vw;gap:0;
+  }
+  header{
+    grid-area:head;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 26px;border-bottom:1px solid var(--rule);
+    background:linear-gradient(180deg, var(--bone-2), var(--bone));
+    position:relative;z-index:3;
+  }
+  header .brand{display:flex;align-items:baseline;gap:14px}
+  header .mark{
+    width:26px;height:26px;border:1.5px solid var(--ink);border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-family:"Fraunces",serif;font-weight:500;font-size:15px;
+    transform:translateY(6px);
+  }
+  header .title{font-family:"Fraunces",serif;font-weight:400;font-size:20px;letter-spacing:-.01em}
+  header .title em{font-style:italic;color:var(--ink-3);font-weight:400}
+  header .meta{display:flex;gap:28px;align-items:center;color:var(--ink-3);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase}
+  header .meta .dot{width:6px;height:6px;border-radius:50%;background:var(--moss);display:inline-block;margin-right:6px;box-shadow:0 0 0 3px rgba(110,127,87,.15)}
+  header .cap{color:var(--ink);font-family:"Geist Mono",monospace;font-size:11px;letter-spacing:0;text-transform:none}
+
+  /* AI Panel (Left) */
+  .ai-panel{
+    grid-area:ai;
+    border-right:1px solid var(--rule);
+    background:var(--bone-2);
+    display:flex;flex-direction:column;
+    overflow:hidden;
+  }
+  .ai-head{
+    padding:18px 22px 14px;border-bottom:1px solid var(--rule);
+  }
+  .ai-head .eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:8px}
+  .ai-head .eyebrow::after{content:"";flex:1;height:1px;background:var(--rule)}
+  .ai-head h2{font-family:"Fraunces",serif;font-size:22px;font-weight:400;margin:8px 0 6px;letter-spacing:-.01em}
+  .ai-head h2 em{font-style:italic;color:var(--accent)}
+  .ai-head p{margin:0;color:var(--ink-3);font-size:12px}
+
+  .suggest{padding:14px 18px 10px;display:flex;flex-direction:column;gap:6px}
+  .suggest .lbl{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-4);margin-bottom:4px;padding:0 4px}
+  .chip{
+    text-align:left;cursor:pointer;
+    background:var(--bone);border:1px solid var(--rule);
+    padding:9px 12px;font-family:inherit;font-size:12px;color:var(--ink-2);
+    border-radius:2px;transition:all .18s ease;
+    display:flex;align-items:center;gap:8px;
+  }
+  .chip .tag{font-family:"Geist Mono",monospace;font-size:9.5px;color:var(--ink-4);letter-spacing:.05em}
+  .chip:hover{background:var(--ink);color:var(--bone);border-color:var(--ink)}
+  .chip:hover .tag{color:var(--accent-soft)}
+  .chip.active{background:var(--ink);color:var(--bone);border-color:var(--ink)}
+  .chip.active .tag{color:var(--accent-soft)}
+
+  .thread{flex:1;overflow-y:auto;padding:6px 22px 22px;display:flex;flex-direction:column;gap:14px}
+  .thread::-webkit-scrollbar{width:6px}
+  .thread::-webkit-scrollbar-thumb{background:var(--rule);border-radius:3px}
+  .msg{font-size:12.5px;line-height:1.55}
+  .msg.user{
+    color:var(--ink);font-family:"Fraunces",serif;font-size:15px;font-style:italic;
+    padding:10px 0 4px;border-left:2px solid var(--accent);padding-left:12px;
+  }
+  .msg.claude{color:var(--ink-2)}
+  .msg.claude .who{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .msg.claude .who::after{content:"";flex:1;height:1px;background:var(--rule)}
+  .msg.claude p{margin:0 0 8px}
+  .msg.claude ul{margin:4px 0 10px;padding:0 0 0 18px}
+  .msg.claude li{margin:3px 0;color:var(--ink-2)}
+  .msg.claude .cite{font-family:"Geist Mono",monospace;font-size:10.5px;color:var(--accent);background:rgba(185,86,42,.08);padding:1px 4px;border-radius:2px}
+  .msg.claude .footnote{font-size:10.5px;color:var(--ink-4);padding-top:6px;border-top:1px dashed var(--rule);margin-top:10px;letter-spacing:.02em}
+
+  .typing{display:inline-flex;gap:3px;align-items:center;padding:4px 0}
+  .typing span{width:5px;height:5px;border-radius:50%;background:var(--accent);opacity:.4;animation:pulse 1.2s infinite}
+  .typing span:nth-child(2){animation-delay:.2s}
+  .typing span:nth-child(3){animation-delay:.4s}
+  @keyframes pulse{0%,60%,100%{opacity:.2;transform:translateY(0)}30%{opacity:1;transform:translateY(-2px)}}
+
+  /* Stage (center) */
+  .stage{
+    grid-area:stage;
+    position:relative;
+    background:
+      radial-gradient(ellipse 70% 50% at 50% 40%, var(--bone-2) 0%, var(--bone) 50%, var(--bone-3) 100%);
+    overflow:hidden;
+    border-bottom:1px solid var(--rule);
+  }
+  #three-container{position:absolute;inset:0}
+  #three-container canvas{display:block;width:100%;height:100%}
+
+  .stage-chrome{position:absolute;inset:0;pointer-events:none}
+  .stage-chrome > *{pointer-events:auto}
+
+  .stage-title{
+    position:absolute;top:22px;left:26px;max-width:340px;
+  }
+  .stage-title .eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+  .stage-title h1{font-family:"Fraunces",serif;font-size:30px;font-weight:400;margin:0;line-height:1.05;letter-spacing:-.015em}
+  .stage-title h1 em{font-style:italic;color:var(--ink-3)}
+  .stage-title .sub{font-size:11.5px;color:var(--ink-3);margin-top:4px;font-family:"Geist Mono",monospace;letter-spacing:0}
+
+  .view-switch{
+    position:absolute;top:22px;right:26px;
+    display:flex;gap:0;border:1px solid var(--rule);background:var(--bone-2);
+  }
+  .view-switch button{
+    padding:7px 12px;font-family:"Geist Mono",monospace;font-size:10.5px;letter-spacing:.06em;
+    background:transparent;border:none;cursor:pointer;color:var(--ink-3);text-transform:uppercase;
+  }
+  .view-switch button.on{background:var(--ink);color:var(--bone)}
+
+  .legend{
+    position:absolute;bottom:22px;left:26px;
+    background:var(--bone-2);border:1px solid var(--rule);
+    padding:12px 16px;display:flex;gap:18px;align-items:center;
+    font-size:11px;
+  }
+  .legend .item{display:flex;align-items:center;gap:6px;color:var(--ink-2)}
+  .legend .sw{width:10px;height:10px;border-radius:1px}
+  .legend .lbl{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-4);border-right:1px solid var(--rule);padding-right:14px}
+
+  .compass{
+    position:absolute;bottom:22px;right:26px;
+    width:54px;height:54px;border:1px solid var(--rule);border-radius:50%;
+    background:var(--bone-2);display:flex;align-items:center;justify-content:center;
+    font-family:"Fraunces",serif;font-size:11px;color:var(--ink-3);
+  }
+  .compass::before{content:"N";position:absolute;top:4px}
+  .compass::after{content:"";position:absolute;top:8px;width:1px;height:10px;background:var(--accent)}
+
+  /* Detail panel (right) */
+  .detail-panel{
+    grid-area:detail;
+    border-left:1px solid var(--rule);
+    background:var(--bone-2);
+    display:flex;flex-direction:column;
+    overflow-y:auto;
+  }
+  .detail-panel::-webkit-scrollbar{width:6px}
+  .detail-panel::-webkit-scrollbar-thumb{background:var(--rule)}
+
+  .detail-empty{padding:28px 24px;color:var(--ink-3);font-size:12.5px}
+  .detail-empty .eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px}
+  .detail-empty h3{font-family:"Fraunces",serif;font-weight:400;font-size:22px;margin:0 0 12px;line-height:1.2;color:var(--ink);letter-spacing:-.01em}
+  .detail-empty h3 em{font-style:italic;color:var(--ink-3)}
+
+  .kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);margin:0 20px;border:1px solid var(--rule)}
+  .kpi{background:var(--bone-2);padding:12px 14px}
+  .kpi .lbl{font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-4);margin-bottom:4px}
+  .kpi .val{font-family:"Fraunces",serif;font-size:24px;font-weight:400;line-height:1;letter-spacing:-.02em}
+  .kpi .val.mono{font-family:"Geist Mono",monospace;font-size:18px}
+  .kpi .delta{font-size:10.5px;margin-top:3px;font-family:"Geist Mono",monospace;color:var(--ink-4)}
+  .kpi .delta.up{color:var(--moss)}
+  .kpi .delta.down{color:var(--rose)}
+
+  /* Unit detail */
+  .unit-head{padding:22px 24px 18px;border-bottom:1px solid var(--rule)}
+  .unit-head .eyebrow{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px;display:flex;justify-content:space-between}
+  .unit-head .eyebrow .close{cursor:pointer;color:var(--ink-4);font-size:14px;letter-spacing:0;text-transform:none}
+  .unit-head .eyebrow .close:hover{color:var(--accent)}
+  .unit-head h3{font-family:"Fraunces",serif;font-weight:400;font-size:34px;margin:0;letter-spacing:-.02em}
+  .unit-head .addr{color:var(--ink-3);margin-top:2px;font-family:"Geist Mono",monospace;font-size:11px}
+  .status-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 8px;margin-top:10px;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;
+    border:1px solid;background:rgba(0,0,0,.02);font-family:"Geist Mono",monospace;
+  }
+  .status-pill .sw{width:7px;height:7px;border-radius:50%}
+
+  .unit-body{padding:18px 24px 22px}
+  .row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px dotted var(--rule)}
+  .row:last-child{border-bottom:none}
+  .row .k{font-size:11px;color:var(--ink-3);letter-spacing:.04em}
+  .row .v{font-family:"Geist Mono",monospace;font-size:12px;color:var(--ink)}
+
+  .section{padding:16px 24px}
+  .section h4{font-family:"Fraunces",serif;font-weight:500;font-size:13px;margin:0 0 10px;letter-spacing:.02em;color:var(--ink);display:flex;align-items:center;gap:10px;text-transform:uppercase;font-size:10.5px;letter-spacing:.18em}
+  .section h4::after{content:"";flex:1;height:1px;background:var(--rule)}
+
+  .wo-item{padding:9px 0;border-bottom:1px dotted var(--rule)}
+  .wo-item .wo-top{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);font-family:"Geist Mono",monospace}
+  .wo-item .wo-top .open{color:var(--amber)}
+  .wo-item .wo-top .closed{color:var(--moss)}
+  .wo-item .wo-top .stalled{color:var(--rose)}
+  .wo-item .desc{font-size:12.5px;color:var(--ink);margin-top:3px}
+
+  .tenant-card{display:flex;gap:12px;align-items:flex-start;padding:6px 0}
+  .tenant-card .avatar{width:36px;height:36px;border-radius:50%;background:var(--bone-3);display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-size:14px;color:var(--ink-2);border:1px solid var(--rule)}
+  .tenant-card .info .name{font-weight:500;font-size:13px}
+  .tenant-card .info .sub{font-size:11px;color:var(--ink-3);font-family:"Geist Mono",monospace;margin-top:2px}
+
+  /* Bottom bar */
+  .bottom{
+    grid-area:bottom;
+    display:grid;grid-template-rows: auto 1fr;
+    background:var(--bone);
+    border-top:1px solid var(--rule);
+  }
+
+  .timeline{
+    padding:10px 26px 4px;display:flex;align-items:center;gap:18px;
+    border-bottom:1px solid var(--rule);background:var(--bone-2);
+  }
+  .timeline .lbl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+  .timeline .track{flex:1;position:relative;height:34px;display:flex;align-items:center}
+  .timeline .axis{position:absolute;top:50%;left:0;right:0;height:1px;background:var(--rule)}
+  .timeline .ticks{position:relative;width:100%;display:flex;justify-content:space-between}
+  .timeline .tick{position:relative;font-family:"Geist Mono",monospace;font-size:10px;color:var(--ink-4);text-align:center;flex:1;cursor:pointer;padding:8px 0}
+  .timeline .tick::before{content:"";position:absolute;top:50%;left:50%;transform:translateX(-50%);width:1px;height:6px;background:var(--rule-2)}
+  .timeline .tick.current{color:var(--accent);font-weight:500}
+  .timeline .tick.current::before{background:var(--accent);width:2px;height:10px}
+  .timeline .scrubber{
+    position:absolute;top:50%;transform:translate(-50%,-50%);
+    width:14px;height:14px;border-radius:50%;background:var(--accent);
+    box-shadow:0 0 0 3px var(--bone-2),0 0 0 4px var(--accent);
+    pointer-events:none;z-index:2;
+  }
+  .timeline .now-label{
+    position:absolute;top:-6px;transform:translateX(-50%);
+    font-family:"Geist Mono",monospace;font-size:10.5px;color:var(--accent);
+    background:var(--bone-2);padding:0 6px;letter-spacing:.04em;
+  }
+
+  .charts{
+    display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:0;
+  }
+  .chart-cell{padding:14px 20px 10px;border-right:1px solid var(--rule);position:relative;min-width:0}
+  .chart-cell:last-child{border-right:none}
+  .chart-cell h5{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);margin:0 0 2px;font-weight:500}
+  .chart-cell .big{font-family:"Fraunces",serif;font-weight:400;font-size:26px;letter-spacing:-.02em;margin-top:2px}
+  .chart-cell .big .unit{font-family:"Geist Mono",monospace;font-size:12px;color:var(--ink-3);margin-left:4px;vertical-align:baseline}
+  .chart-cell .small{font-size:11px;color:var(--ink-3);font-family:"Geist Mono",monospace}
+  .chart-cell .small.up{color:var(--moss)}
+  .chart-cell .small.down{color:var(--rose)}
+  .chart-cell svg{width:100%;display:block;overflow:visible}
+
+  /* d3 overrides */
+  .axis text{font-family:"Geist Mono",monospace;font-size:9.5px;fill:var(--ink-4)}
+  .axis line, .axis path{stroke:var(--rule)}
+
+  /* utility */
+  .hl{color:var(--accent);font-weight:500}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <div class="brand">
+      <span class="mark">◐</span>
+      <div>
+        <div class="title">Operational <em>Digital Twin</em></div>
+        <div style="font-size:10.5px;color:var(--ink-3);font-family:'Geist Mono',monospace;letter-spacing:.04em;margin-top:-2px">Pilot Demo — PV Management Co.</div>
+      </div>
+    </div>
+    <div class="meta">
+      <span><span class="dot"></span>LIVE DATA · APPFOLIO BRIDGE</span>
+      <span class="cap" id="now-ts">— — —</span>
+      <span>PILOT PROPERTY 01 / 01</span>
+    </div>
+  </header>
+
+  <aside class="ai-panel">
+    <div class="ai-head">
+      <div class="eyebrow">Assistive Intelligence</div>
+      <h2>Ask the <em>twin</em>.</h2>
+      <p>Natural-language queries across the operational model. Every answer is grounded in live data with unit-level citations and human-in-the-loop by design.</p>
+    </div>
+
+    <div class="suggest">
+      <div class="lbl">Try one of these</div>
+      <button class="chip" data-q="vacancy_risk"><span class="tag">01</span>Which units are at risk of extended vacancy?</button>
+      <button class="chip" data-q="month_signal"><span class="tag">02</span>Summarize this month's operational signal.</button>
+      <button class="chip" data-q="focus_week"><span class="tag">03</span>Where should I focus this week?</button>
+      <button class="chip" data-q="patterns"><span class="tag">04</span>Are there any hidden patterns?</button>
+    </div>
+
+    <div class="thread" id="thread">
+      <div class="msg claude">
+        <div class="who">Twin · idle</div>
+        <p>Good morning, Cary. The pilot is observing <span class="hl">24 units across 4 floors</span> with continuous data flow from AppFolio and the maintenance queue.</p>
+        <p>Click any unit in the model to inspect. Scrub the timeline to replay history. Or try a prompt above.</p>
+      </div>
+    </div>
+  </aside>
+
+  <div class="stage">
+    <div id="three-container"></div>
+
+    <div class="stage-chrome">
+      <div class="stage-title">
+        <div class="eyebrow">Pilot Site · Unit 01</div>
+        <h1>Alameda <em>Gardens</em></h1>
+        <div class="sub">1428 ALAMEDA PL · 24 UNITS · 4 FLOORS · BUILT 1988</div>
+      </div>
+
+      <div class="view-switch">
+        <button class="on" data-view="status">Status</button>
+        <button data-view="rent">Rent</button>
+        <button data-view="age">Lease Age</button>
+      </div>
+
+      <div class="legend" id="legend">
+        <span class="lbl">Unit State</span>
+        <span class="item"><span class="sw" style="background:var(--moss)"></span>Occupied</span>
+        <span class="item"><span class="sw" style="background:var(--ghost);border:1px dashed var(--rule-2)"></span>Vacant</span>
+        <span class="item"><span class="sw" style="background:var(--amber)"></span>In Turn</span>
+        <span class="item"><span class="sw" style="background:var(--slate)"></span>Work Order</span>
+        <span class="item"><span class="sw" style="background:var(--rose)"></span>Delinquent</span>
+      </div>
+
+      <div class="compass"></div>
+    </div>
+  </div>
+
+  <aside class="detail-panel" id="detail">
+    <!-- populated by JS -->
+  </aside>
+
+  <div class="bottom">
+    <div class="timeline">
+      <div class="lbl">Temporal Ledger</div>
+      <div class="track" id="tl-track">
+        <div class="axis"></div>
+        <div class="ticks" id="tl-ticks"></div>
+        <div class="scrubber" id="tl-scrubber"></div>
+        <div class="now-label" id="tl-label">—</div>
+      </div>
+      <div class="lbl" style="font-family:'Geist Mono',monospace;letter-spacing:.02em;text-transform:none;color:var(--ink-3)">drag to replay</div>
+    </div>
+
+    <div class="charts">
+      <div class="chart-cell">
+        <h5>Occupancy Trend · 12 mo</h5>
+        <div class="big"><span id="occ-big">—</span><span class="unit">%</span></div>
+        <div class="small" id="occ-delta">—</div>
+        <svg id="chart-occupancy" viewBox="0 0 320 80" preserveAspectRatio="none" style="height:80px;margin-top:2px"></svg>
+      </div>
+      <div class="chart-cell">
+        <h5>Avg Turn Cycle</h5>
+        <div class="big"><span id="turn-big">—</span><span class="unit">days</span></div>
+        <div class="small" id="turn-delta">—</div>
+        <svg id="chart-turn" viewBox="0 0 240 80" preserveAspectRatio="none" style="height:80px;margin-top:2px"></svg>
+      </div>
+      <div class="chart-cell">
+        <h5>Work Orders</h5>
+        <div class="big"><span id="wo-big">—</span><span class="unit">open</span></div>
+        <div class="small" id="wo-delta">—</div>
+        <svg id="chart-wo" viewBox="0 0 240 80" preserveAspectRatio="none" style="height:80px;margin-top:2px"></svg>
+      </div>
+      <div class="chart-cell">
+        <h5>Delinquency Ratio</h5>
+        <div class="big"><span id="del-big">—</span><span class="unit">%</span></div>
+        <div class="small" id="del-delta">—</div>
+        <svg id="chart-del" viewBox="0 0 240 80" preserveAspectRatio="none" style="height:80px;margin-top:2px"></svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+console.log("%c◐ Operational Digital Twin · build 2026-04-24.c", "color:#B9562A;font-family:monospace;font-weight:bold");
+/* ============================================================
+   DATA MODEL — pseudo-deterministic synthetic operational data
+   ============================================================ */
+
+const MONTHS = ["May '25","Jun '25","Jul '25","Aug '25","Sep '25","Oct '25","Nov '25","Dec '25","Jan '26","Feb '26","Mar '26","Apr '26"];
+const N_MONTHS = MONTHS.length;
+const CURRENT_M = N_MONTHS - 1; // Apr '26 is "now"
+let currentMonth = CURRENT_M; // hoisted — used by render loop before timeline section
+
+// Simple seeded RNG so the scene is deterministic
+function rng(seed){
+  let s = seed|0;
+  return function(){ s = (s*1664525 + 1013904223) & 0xffffffff; return ((s>>>0)/4294967296); };
+}
+
+const TENANT_NAMES = [
+  "M. Alvarado","T. Chen","J. Whitfield","R. Okafor","P. Sundaram","K. Müller",
+  "E. Bazán","D. Park","A. Lindgren","S. Patel","C. Okereke","N. Rossi",
+  "V. Petrov","L. Martín","W. Adeyemi","H. Sato","B. Carrillo","G. Weiss",
+  "F. Dubois","Y. Nakamura","R. Blackwood","O. Hassan","I. Kowalski","Z. Tran"
+];
+
+const WO_TYPES = [
+  {d:"HVAC compressor not cooling",cat:"HVAC"},
+  {d:"Dishwasher leaking under sink",cat:"Appliance"},
+  {d:"Bathroom fan replacement",cat:"Electrical"},
+  {d:"Flooring replacement — unit turn",cat:"Turn"},
+  {d:"Refrigerator thermostat",cat:"Appliance"},
+  {d:"Window seal re-caulk",cat:"Envelope"},
+  {d:"Garbage disposal jammed",cat:"Plumbing"},
+  {d:"Smoke detector battery replacement",cat:"Safety"},
+  {d:"Paint touch-up — make ready",cat:"Turn"},
+  {d:"Water heater pilot out",cat:"Plumbing"},
+];
+
+// Narrative patterns — hand-seeded so the demo feels real
+const NARRATIVES = {
+  // unitIdx (0-23) -> array of monthly statuses
+  // status: 'occupied','vacant','in-turn','delinquent','work-order'
+  4:  ["occupied","occupied","occupied","occupied","occupied","work-order","occupied","occupied","occupied","occupied","occupied","occupied"], // stable + past repair
+  2:  ["occupied","occupied","occupied","delinquent","delinquent","delinquent","occupied","occupied","occupied","occupied","delinquent","delinquent"], // recurring late
+  7:  ["occupied","occupied","vacant","in-turn","in-turn","occupied","occupied","occupied","occupied","occupied","occupied","occupied"],
+  9:  ["occupied","occupied","occupied","occupied","occupied","occupied","occupied","occupied","vacant","in-turn","in-turn","in-turn"], // stalled turn
+  13: ["occupied","work-order","occupied","occupied","occupied","occupied","work-order","occupied","occupied","occupied","occupied","work-order"], // chronic
+  15: ["occupied","occupied","occupied","occupied","occupied","occupied","occupied","occupied","occupied","vacant","in-turn","in-turn"], // recent vacancy, amber
+  19: ["occupied","occupied","occupied","occupied","occupied","occupied","occupied","occupied","occupied","occupied","occupied","work-order"], // fresh
+  22: ["vacant","in-turn","in-turn","occupied","occupied","occupied","occupied","occupied","occupied","occupied","occupied","occupied"], // healed early
+};
+
+function buildUnits(){
+  const units = [];
+  const FL = 4, PER = 6;
+  const r = rng(42);
+
+  for (let f=0; f<FL; f++){
+    for (let u=0; u<PER; u++){
+      const idx = f*PER + u;
+      const number = `${f+1}${String(u+1).padStart(2,"0")}`;
+      const beds = (u%3===0) ? 1 : 2;
+      const sqft = beds===1 ? 720 : (u%2?950:1080);
+      const rent = Math.round((1750 + beds*350 + f*60 + (r()*200 - 100))/10)*10;
+
+      let history;
+      if (NARRATIVES[idx]){
+        history = NARRATIVES[idx];
+      } else {
+        // mostly occupied; occasional blips
+        history = [];
+        let state = "occupied";
+        for (let m=0; m<N_MONTHS; m++){
+          const roll = r();
+          if (state==="occupied" && roll<0.04) state="work-order";
+          else if (state==="work-order" && roll<0.7) state="occupied";
+          history.push(state);
+        }
+      }
+
+      // 2d layout: 2 rows of 3 per floor (corridor between)
+      const row = u < 3 ? 0 : 1; // front(0) or back(1)
+      const col = u % 3;
+
+      units.push({
+        idx, number, floor:f, slot:u, row, col, beds, sqft, rent,
+        tenant: TENANT_NAMES[idx % TENANT_NAMES.length],
+        leaseStart: `20${24 - (idx%3)}-${String(((idx*3)%12)+1).padStart(2,"0")}-01`,
+        history,
+        workOrders: (history.filter(h=>h==="work-order").length>0 || idx%5===0) ? generateWOs(idx, r, history) : [],
+      });
+    }
+  }
+  return units;
+}
+
+function generateWOs(idx, r, history){
+  const wos = [];
+  const n = 1 + Math.floor(r()*2);
+  for (let i=0;i<n;i++){
+    const t = WO_TYPES[(idx+i*3) % WO_TYPES.length];
+    const age = Math.floor(r()*14) + 1;
+    let status = "open";
+    if (history[CURRENT_M] === "work-order" && i===0) status = age>8 ? "stalled" : "open";
+    else if (r()>0.5) status = "closed";
+    wos.push({
+      id: `WO-${String(4200 + idx*7 + i).padStart(4,"0")}`,
+      ...t, ageDays: age, status
+    });
+  }
+  return wos;
+}
+
+const UNITS = buildUnits();
+
+// Derive monthly aggregates
+function aggregates(monthIdx){
+  const total = UNITS.length;
+  let occ=0, vacant=0, turn=0, wo=0, del=0;
+  UNITS.forEach(u=>{
+    const s = u.history[monthIdx];
+    if (s==="occupied") occ++;
+    else if (s==="vacant") vacant++;
+    else if (s==="in-turn") turn++;
+    else if (s==="work-order") { occ++; wo++; }
+    else if (s==="delinquent") { occ++; del++; }
+  });
+  return {
+    total,
+    occupancyPct: Math.round((occ/total)*1000)/10,
+    vacant, turn,
+    turnDaysAvg: 9.5 + (turn*1.6) + (monthIdx===CURRENT_M?3.1:0), // rough
+    wo, del,
+    delinquencyPct: Math.round((del/total)*1000)/10
+  };
+}
+const AGG = MONTHS.map((_,i)=>aggregates(i));
+
+/* ============================================================
+   THREE.JS — building model
+   ============================================================ */
+
+const COLORS = {
+  occupied:   new THREE.Color("#7B8C65"),
+  vacant:     new THREE.Color("#C7BCA5"),
+  "in-turn":  new THREE.Color("#C38A2E"),
+  "work-order":new THREE.Color("#486178"),
+  delinquent: new THREE.Color("#A74834"),
+  dimmed:     new THREE.Color("#B8AC95"),
+};
+
+const EMISSIVE_STATES = new Set(["in-turn","work-order","delinquent"]);
+
+const container = document.getElementById("three-container");
+const scene = new THREE.Scene();
+scene.background = null;
+scene.fog = new THREE.Fog(0xEDE6D7, 40, 120);
+
+const camera = new THREE.PerspectiveCamera(32, container.clientWidth/container.clientHeight, 0.1, 500);
+camera.position.set(28, 22, 34);
+camera.lookAt(0, 5.5, 0);
+
+const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(container.clientWidth, container.clientHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+container.appendChild(renderer.domElement);
+
+// Lights
+const ambient = new THREE.AmbientLight(0xffffff, 0.65);
+scene.add(ambient);
+const sun = new THREE.DirectionalLight(0xfff2d9, 0.85);
+sun.position.set(18, 30, 14);
+sun.castShadow = true;
+sun.shadow.camera.left = -20; sun.shadow.camera.right = 20;
+sun.shadow.camera.top = 20; sun.shadow.camera.bottom = -20;
+sun.shadow.mapSize.set(1024, 1024);
+scene.add(sun);
+const fill = new THREE.DirectionalLight(0xc9d4e0, 0.25);
+fill.position.set(-15, 10, -10);
+scene.add(fill);
+
+// Ground plane — bone with subtle grid
+const groundGeo = new THREE.PlaneGeometry(120, 120);
+const groundMat = new THREE.MeshStandardMaterial({color:0xE2D9C4, roughness:0.95});
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI/2;
+ground.position.y = -0.01;
+ground.receiveShadow = true;
+scene.add(ground);
+
+// Grid
+const grid = new THREE.GridHelper(80, 40, 0xB9A88D, 0xCDBFA8);
+grid.material.transparent = true;
+grid.material.opacity = 0.35;
+scene.add(grid);
+
+// Site plinth (slightly raised platform)
+const plinthGeo = new THREE.BoxGeometry(16, 0.2, 12);
+const plinthMat = new THREE.MeshStandardMaterial({color:0xD8CCB2, roughness:1});
+const plinth = new THREE.Mesh(plinthGeo, plinthMat);
+plinth.position.y = 0.1;
+plinth.receiveShadow = true;
+scene.add(plinth);
+
+// Building parameters
+const UW = 3.2;   // unit width (along X)
+const UD = 3.8;   // unit depth (along Z)
+const UH = 2.4;   // unit height
+const FG = 0.18;  // floor gap
+const CORRIDOR = 1.0;
+
+const FL = 4, PER_FLOOR = 6;
+const COLS = 3, ROWS = 2;
+
+const buildingGroup = new THREE.Group();
+scene.add(buildingGroup);
+
+const unitMeshes = []; // parallel to UNITS
+const unitMaterials = [];
+
+// Position helper
+function unitPosition(row, col, floor){
+  const x = (col - (COLS-1)/2) * UW;
+  const z = (row - 0.5) * (UD + CORRIDOR);
+  const y = floor * (UH + FG) + UH/2 + 0.2; // +plinth
+  return {x, y, z};
+}
+
+// Build units
+UNITS.forEach((u, i) => {
+  const {x,y,z} = unitPosition(u.row, u.col, u.floor);
+  const geo = new THREE.BoxGeometry(UW*0.94, UH*0.92, UD*0.94);
+  const mat = new THREE.MeshStandardMaterial({
+    color: COLORS.occupied.clone(),
+    roughness: 0.75,
+    metalness: 0.05,
+    emissive: new THREE.Color(0x000000),
+    emissiveIntensity: 0.0,
+    transparent:true,
+    opacity:0.95,
+  });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.set(x,y,z);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  mesh.userData = {unitIdx: i};
+  buildingGroup.add(mesh);
+  unitMeshes.push(mesh);
+  unitMaterials.push(mat);
+
+  // Window mullions (thin dark bands) on front face
+  const mullionMat = new THREE.MeshBasicMaterial({color:0x2A2522, transparent:true, opacity:0.55});
+  const isFront = u.row === 0;
+  const bandGeo = new THREE.PlaneGeometry(UW*0.7, 0.06);
+  const band = new THREE.Mesh(bandGeo, mullionMat);
+  band.position.set(x, y - UH*0.1, z + (isFront ? -UD*0.47 : UD*0.47) + (isFront?-0.001:0.001));
+  if (!isFront) band.rotation.y = Math.PI;
+  buildingGroup.add(band);
+
+  const bandGeo2 = new THREE.PlaneGeometry(UW*0.7, 0.03);
+  const band2 = new THREE.Mesh(bandGeo2, mullionMat);
+  band2.position.set(x, y + UH*0.25, z + (isFront ? -UD*0.47 : UD*0.47) + (isFront?-0.001:0.001));
+  if (!isFront) band2.rotation.y = Math.PI;
+  buildingGroup.add(band2);
+});
+
+// Floor slabs (thin plates between floors)
+for (let f=0; f<=FL; f++){
+  const slabGeo = new THREE.BoxGeometry(COLS*UW + 0.8, 0.08, ROWS*UD + CORRIDOR + 0.8);
+  const slabMat = new THREE.MeshStandardMaterial({color:0xEDE6D7, roughness:1});
+  const slab = new THREE.Mesh(slabGeo, slabMat);
+  slab.position.y = f * (UH + FG) + 0.2 - 0.02;
+  if (f===FL) slab.position.y = FL * (UH + FG) + 0.2 - 0.02;
+  slab.castShadow = f>0;
+  slab.receiveShadow = true;
+  buildingGroup.add(slab);
+}
+
+// Building edges — architectural wireframe
+const edgeMat = new THREE.LineBasicMaterial({color:0x3A332E, transparent:true, opacity:0.55});
+// vertical columns at corners
+const columnCorners = [
+  [-COLS*UW/2 - 0.4, -UD - CORRIDOR/2 - 0.4],
+  [ COLS*UW/2 + 0.4, -UD - CORRIDOR/2 - 0.4],
+  [-COLS*UW/2 - 0.4,  UD + CORRIDOR/2 + 0.4],
+  [ COLS*UW/2 + 0.4,  UD + CORRIDOR/2 + 0.4],
+];
+columnCorners.forEach(([cx,cz])=>{
+  const points = [new THREE.Vector3(cx,0.2,cz), new THREE.Vector3(cx, FL*(UH+FG)+0.3, cz)];
+  const g = new THREE.BufferGeometry().setFromPoints(points);
+  buildingGroup.add(new THREE.Line(g, edgeMat));
+});
+
+// Roof cap
+const roofGeo = new THREE.BoxGeometry(COLS*UW + 0.8, 0.25, ROWS*UD + CORRIDOR + 0.8);
+const roofMat = new THREE.MeshStandardMaterial({color:0x3A332E, roughness:.9});
+const roof = new THREE.Mesh(roofGeo, roofMat);
+roof.position.y = FL*(UH+FG) + 0.4;
+roof.castShadow = true;
+buildingGroup.add(roof);
+
+// Roof accent strip
+const stripGeo = new THREE.BoxGeometry(COLS*UW + 0.85, 0.04, ROWS*UD + CORRIDOR + 0.85);
+const stripMat = new THREE.MeshBasicMaterial({color:0xB9562A});
+const strip = new THREE.Mesh(stripGeo, stripMat);
+strip.position.y = FL*(UH+FG) + 0.55;
+buildingGroup.add(strip);
+
+// Entry awning (front center, ground)
+const awnGeo = new THREE.BoxGeometry(2.2, 0.08, 0.9);
+const awn = new THREE.Mesh(awnGeo, new THREE.MeshStandardMaterial({color:0x191513}));
+awn.position.set(0, 1.2, -UD - CORRIDOR/2 - 0.45);
+awn.castShadow = true;
+buildingGroup.add(awn);
+
+// Trees / dots on site
+const treeMat = new THREE.MeshStandardMaterial({color:0x6E7F57, roughness:1});
+[[-6,-3],[6,-3],[-6,3],[6,3],[-7,0]].forEach(([tx,tz])=>{
+  const t = new THREE.Mesh(new THREE.SphereGeometry(0.35, 12, 10), treeMat);
+  t.position.set(tx, 0.6, tz); t.castShadow = true;
+  scene.add(t);
+  const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.06,0.6), new THREE.MeshStandardMaterial({color:0x3A332E}));
+  trunk.position.set(tx, 0.3, tz); scene.add(trunk);
+});
+
+// Selection ring
+const ringGeo = new THREE.RingGeometry(2.2, 2.35, 48);
+const ringMat = new THREE.MeshBasicMaterial({color:0xB9562A, side:THREE.DoubleSide, transparent:true, opacity:0});
+const selRing = new THREE.Mesh(ringGeo, ringMat);
+selRing.rotation.x = -Math.PI/2;
+selRing.position.y = 0.22;
+scene.add(selRing);
+
+// Unit hover/selection state
+let hoveredIdx = -1;
+let selectedIdx = -1;
+let highlightSet = null;  // Set of unit indices to keep emphasized
+
+// Status application
+let viewMode = "status"; // status | rent | age
+
+function colorForUnit(u, s){
+  if (viewMode === "rent"){
+    // map rent across palette: cream -> amber -> rust
+    const min = 1750, max = 2850;
+    const t = Math.max(0, Math.min(1, (u.rent-min)/(max-min)));
+    const c = new THREE.Color().setHSL(0.08 - t*0.05, 0.45, 0.75 - t*0.25);
+    return c;
+  }
+  if (viewMode === "age"){
+    // older lease = deeper moss, newer = lighter
+    const year = +u.leaseStart.slice(0,4);
+    const age = 2026 - year;
+    const t = Math.max(0, Math.min(1, age/3));
+    const c = new THREE.Color().setHSL(0.25 - t*0.05, 0.20 + t*0.15, 0.70 - t*0.20);
+    return c;
+  }
+  return COLORS[s] ? COLORS[s].clone() : COLORS.vacant.clone();
+}
+
+function applyStatuses(monthIdx){
+  UNITS.forEach((u,i)=>{
+    const s = u.history[monthIdx];
+    const mat = unitMaterials[i];
+    const baseColor = colorForUnit(u, s);
+
+    // dim if not in highlightSet
+    const emphasized = !highlightSet || highlightSet.has(i);
+    if (!emphasized){
+      mat.color.copy(COLORS.dimmed);
+      mat.opacity = 0.35;
+      mat.emissiveIntensity = 0;
+    } else {
+      mat.color.copy(baseColor);
+      mat.opacity = (viewMode==="status" && s==="vacant") ? 0.55 : 0.95;
+      mat.emissive.copy(baseColor);
+      mat.emissiveIntensity = (viewMode==="status" && EMISSIVE_STATES.has(s)) ? 0.22 : 0.0;
+    }
+
+    // selected pulse (always wins)
+    if (i===selectedIdx){
+      mat.emissive.set(0xB9562A);
+      mat.emissiveIntensity = 0.35 + 0.15*Math.sin(performance.now()/260);
+    }
+  });
+}
+
+// View mode switcher
+document.querySelectorAll(".view-switch button").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".view-switch button").forEach(b=>b.classList.remove("on"));
+    btn.classList.add("on");
+    viewMode = btn.dataset.view;
+    updateLegend();
+  });
+});
+
+function updateLegend(){
+  const el = document.getElementById("legend");
+  if (viewMode==="status"){
+    el.innerHTML = `
+      <span class="lbl">Unit State</span>
+      <span class="item"><span class="sw" style="background:var(--moss)"></span>Occupied</span>
+      <span class="item"><span class="sw" style="background:var(--ghost);border:1px dashed var(--rule-2)"></span>Vacant</span>
+      <span class="item"><span class="sw" style="background:var(--amber)"></span>In Turn</span>
+      <span class="item"><span class="sw" style="background:var(--slate)"></span>Work Order</span>
+      <span class="item"><span class="sw" style="background:var(--rose)"></span>Delinquent</span>`;
+  } else if (viewMode==="rent"){
+    el.innerHTML = `
+      <span class="lbl">Monthly Rent</span>
+      <span class="item" style="font-family:'Geist Mono',monospace;font-size:10.5px">$1,750</span>
+      <span class="item"><span class="sw" style="width:140px;height:10px;background:linear-gradient(90deg, hsl(28,45%,75%), hsl(14,45%,50%))"></span></span>
+      <span class="item" style="font-family:'Geist Mono',monospace;font-size:10.5px">$2,850+</span>`;
+  } else {
+    el.innerHTML = `
+      <span class="lbl">Lease Tenure</span>
+      <span class="item" style="font-family:'Geist Mono',monospace;font-size:10.5px">&lt; 1 yr</span>
+      <span class="item"><span class="sw" style="width:140px;height:10px;background:linear-gradient(90deg, hsl(90,20%,70%), hsl(72,35%,50%))"></span></span>
+      <span class="item" style="font-family:'Geist Mono',monospace;font-size:10.5px">3+ yrs</span>`;
+  }
+}
+
+// Raycaster
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+function onPointerMove(e){
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((e.clientX - rect.left)/rect.width)*2 - 1;
+  mouse.y = -((e.clientY - rect.top)/rect.height)*2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(unitMeshes, false);
+  const idx = hits.length ? hits[0].object.userData.unitIdx : -1;
+  if (idx !== hoveredIdx){
+    hoveredIdx = idx;
+    container.style.cursor = idx>=0 ? "pointer" : "default";
+  }
+}
+function onClick(e){
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((e.clientX - rect.left)/rect.width)*2 - 1;
+  mouse.y = -((e.clientY - rect.top)/rect.height)*2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(unitMeshes, false);
+  if (hits.length){
+    selectUnit(hits[0].object.userData.unitIdx);
+  }
+}
+renderer.domElement.addEventListener("pointermove", onPointerMove);
+renderer.domElement.addEventListener("click", onClick);
+
+// Gentle camera idle drift
+let cameraAngle = 0;
+const CAM_RADIUS = Math.sqrt(28*28 + 34*34);
+function updateCamera(){
+  cameraAngle += 0.0008;
+  const off = Math.sin(cameraAngle)*1.2;
+  camera.position.x = 28 + off;
+  camera.position.z = 34 - off*0.4;
+  camera.lookAt(0, 5.5, 0);
+}
+
+// Render loop
+function animate(){
+  requestAnimationFrame(animate);
+  updateCamera();
+  // hover effect
+  unitMeshes.forEach((m,i)=>{
+    const targetY = m.userData.baseY || m.position.y;
+    if (!m.userData.baseY) m.userData.baseY = m.position.y;
+  });
+  if (selectedIdx >= 0){
+    const u = UNITS[selectedIdx];
+    const pos = unitPosition(u.row, u.col, u.floor);
+    selRing.position.set(pos.x, 0.22, pos.z);
+    selRing.material.opacity = 0.5 + 0.3*Math.sin(performance.now()/350);
+    selRing.scale.setScalar(1);
+  } else {
+    selRing.material.opacity = 0;
+  }
+  applyStatuses(currentMonth);
+  renderer.render(scene, camera);
+}
+animate();
+
+// Resize
+window.addEventListener("resize", ()=>{
+  camera.aspect = container.clientWidth/container.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(container.clientWidth, container.clientHeight);
+});
+
+/* ============================================================
+   TIMELINE
+   ============================================================ */
+
+const tlTicks = document.getElementById("tl-ticks");
+const tlTrack = document.getElementById("tl-track");
+const tlScrubber = document.getElementById("tl-scrubber");
+const tlLabel = document.getElementById("tl-label");
+
+MONTHS.forEach((m,i)=>{
+  const t = document.createElement("div");
+  t.className = "tick" + (i===currentMonth ? " current" : "");
+  t.dataset.idx = i;
+  t.textContent = m;
+  t.addEventListener("click", ()=>setMonth(i));
+  tlTicks.appendChild(t);
+});
+
+function setMonth(i){
+  currentMonth = Math.max(0, Math.min(N_MONTHS-1, i));
+  updateScrubber();
+  updateCharts();
+  refreshDetail();
+  document.querySelectorAll("#tl-ticks .tick").forEach(el=>{
+    el.classList.toggle("current", +el.dataset.idx===currentMonth);
+  });
+  const nowTs = document.getElementById("now-ts");
+  nowTs.textContent = (currentMonth===CURRENT_M ? "NOW · " : "REPLAY · ") + MONTHS[currentMonth].toUpperCase();
+}
+
+function updateScrubber(){
+  const rect = tlTicks.getBoundingClientRect();
+  const tickEls = tlTicks.querySelectorAll(".tick");
+  if (!tickEls[currentMonth]) return;
+  const tRect = tickEls[currentMonth].getBoundingClientRect();
+  const x = tRect.left - rect.left + tRect.width/2;
+  tlScrubber.style.left = x + "px";
+  tlScrubber.style.top = "50%";
+  tlLabel.style.left = x + "px";
+  tlLabel.textContent = MONTHS[currentMonth];
+}
+
+// Drag scrubber
+let dragging = false;
+tlTrack.addEventListener("mousedown", (e)=>{
+  dragging = true; scrubAt(e);
+});
+window.addEventListener("mousemove", (e)=>{ if (dragging) scrubAt(e); });
+window.addEventListener("mouseup", ()=>{ dragging=false; });
+function scrubAt(e){
+  const rect = tlTicks.getBoundingClientRect();
+  const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+  const i = Math.round((x/rect.width) * (N_MONTHS-1));
+  setMonth(i);
+}
+
+/* ============================================================
+   CHARTS (D3)
+   ============================================================ */
+
+function sparkline(svgSel, values, color, {band=true}={}){
+  const svg = d3.select(svgSel);
+  svg.selectAll("*").remove();
+  // Read viewBox to respect per-chart intrinsic width
+  const vb = (svg.attr("viewBox") || "0 0 320 80").split(" ").map(Number);
+  const w = vb[2] || 320, h = vb[3] || 80, pad = {t:10,r:10,b:18,l:10};
+  const x = d3.scaleLinear().domain([0, values.length-1]).range([pad.l, w-pad.r]);
+  const y = d3.scaleLinear().domain([d3.min(values)*0.92, d3.max(values)*1.08]).range([h-pad.b, pad.t]);
+
+  // baseline ticks
+  const g = svg.append("g");
+  MONTHS.forEach((m,i)=>{
+    g.append("line").attr("x1",x(i)).attr("x2",x(i)).attr("y1",h-pad.b).attr("y2",h-pad.b+3).attr("stroke","#CDBFA8");
+    if (i%3===0) g.append("text").attr("x",x(i)).attr("y",h-pad.b+12).attr("fill","#9A8E82").attr("font-family","Geist Mono").attr("font-size","9").attr("text-anchor","middle").text(m.slice(0,3));
+  });
+
+  if (band){
+    const area = d3.area().x((_,i)=>x(i)).y0(h-pad.b).y1(d=>y(d)).curve(d3.curveMonotoneX);
+    g.append("path").datum(values).attr("d", area).attr("fill", color).attr("opacity",0.14);
+  }
+  const line = d3.line().x((_,i)=>x(i)).y(d=>y(d)).curve(d3.curveMonotoneX);
+  g.append("path").datum(values).attr("d", line).attr("fill","none").attr("stroke", color).attr("stroke-width", 1.75);
+
+  // current point
+  g.append("circle").attr("cx", x(currentMonth)).attr("cy", y(values[currentMonth]))
+    .attr("r", 3.5).attr("fill", color).attr("stroke", "#F4EFE5").attr("stroke-width", 1.5);
+  // current vertical
+  g.append("line").attr("x1",x(currentMonth)).attr("x2",x(currentMonth)).attr("y1",pad.t).attr("y2",h-pad.b)
+    .attr("stroke",color).attr("stroke-dasharray","2 2").attr("opacity",0.45);
+}
+
+function barChart(svgSel, values, color){
+  const svg = d3.select(svgSel);
+  svg.selectAll("*").remove();
+  const w = 240, h=80, pad={t:10,r:10,b:18,l:10};
+  const x = d3.scaleBand().domain(d3.range(values.length)).range([pad.l, w-pad.r]).padding(0.25);
+  const y = d3.scaleLinear().domain([0, d3.max(values)*1.2 || 1]).range([h-pad.b, pad.t]);
+
+  svg.selectAll("rect").data(values).enter().append("rect")
+    .attr("x",(_,i)=>x(i)).attr("y",d=>y(d))
+    .attr("width", x.bandwidth())
+    .attr("height",d=>Math.max(1,h-pad.b - y(d)))
+    .attr("fill",(d,i)=> i===currentMonth ? color : "#CDBFA8");
+
+  MONTHS.forEach((m,i)=>{
+    if (i%3===0) svg.append("text").attr("x",x(i)+x.bandwidth()/2).attr("y",h-pad.b+12).attr("fill","#9A8E82").attr("font-family","Geist Mono").attr("font-size","9").attr("text-anchor","middle").text(m.slice(0,3));
+  });
+}
+
+function updateCharts(){
+  const occ = AGG.map(a=>a.occupancyPct);
+  const turn = AGG.map(a=>+(a.turnDaysAvg.toFixed(1)));
+  const wo = AGG.map(a=>a.wo);
+  const del = AGG.map(a=>a.delinquencyPct);
+
+  sparkline("#chart-occupancy", occ, "#6E7F57");
+  sparkline("#chart-turn", turn, "#C38A2E");
+  barChart("#chart-wo", wo, "#486178");
+  sparkline("#chart-del", del, "#A74834");
+
+  const cur = AGG[currentMonth];
+  const prev = AGG[Math.max(0,currentMonth-1)];
+
+  document.getElementById("occ-big").textContent = cur.occupancyPct.toFixed(1);
+  setDelta("occ-delta", cur.occupancyPct - prev.occupancyPct, "pts", true);
+
+  document.getElementById("turn-big").textContent = cur.turnDaysAvg.toFixed(1);
+  setDelta("turn-delta", cur.turnDaysAvg - prev.turnDaysAvg, "d", false);
+
+  document.getElementById("wo-big").textContent = cur.wo;
+  setDelta("wo-delta", cur.wo - prev.wo, "", false);
+
+  document.getElementById("del-big").textContent = cur.delinquencyPct.toFixed(1);
+  setDelta("del-delta", cur.delinquencyPct - prev.delinquencyPct, "pts", false);
+}
+
+function setDelta(id, delta, unit, higherIsBetter){
+  const el = document.getElementById(id);
+  const sign = delta>0 ? "+" : (delta<0 ? "−" : "±");
+  const val = Math.abs(delta).toFixed(1);
+  let cls = "";
+  if (delta !== 0){
+    const improved = higherIsBetter ? delta>0 : delta<0;
+    cls = improved ? "up" : "down";
+  }
+  el.className = "small " + cls;
+  el.textContent = `${sign}${val}${unit} vs. prior month`;
+}
+
+/* ============================================================
+   DETAIL PANEL
+   ============================================================ */
+
+function refreshDetail(){
+  const el = document.getElementById("detail");
+  if (selectedIdx < 0){ el.innerHTML = renderEmptyDetail(); return; }
+  el.innerHTML = renderUnitDetail(UNITS[selectedIdx]);
+  const close = el.querySelector(".close");
+  if (close) close.addEventListener("click", ()=>{ selectedIdx = -1; refreshDetail(); });
+}
+
+function renderEmptyDetail(){
+  const cur = AGG[currentMonth];
+  return `
+    <div class="detail-empty">
+      <div class="eyebrow">Property Scorecard</div>
+      <h3>Alameda <em>Gardens</em></h3>
+      <p style="margin:0 0 16px">A top-down view of the pilot property at the scrubbed time. Click a unit in the twin to inspect.</p>
+    </div>
+    <div class="kpi-grid">
+      <div class="kpi"><div class="lbl">Occupancy</div><div class="val">${cur.occupancyPct.toFixed(1)}<span style="font-size:14px;color:var(--ink-3)">%</span></div><div class="delta">${cur.total-cur.vacant-cur.turn}/${cur.total} units</div></div>
+      <div class="kpi"><div class="lbl">Avg Turn</div><div class="val mono">${cur.turnDaysAvg.toFixed(1)}<span style="font-size:11px;color:var(--ink-3)">d</span></div><div class="delta">target 11.0d</div></div>
+      <div class="kpi"><div class="lbl">Open Work Orders</div><div class="val mono">${cur.wo}</div><div class="delta">${Math.max(0,cur.wo-2)} aging</div></div>
+      <div class="kpi"><div class="lbl">Delinquent</div><div class="val mono">${cur.del}</div><div class="delta">${cur.delinquencyPct.toFixed(1)}% of units</div></div>
+    </div>
+    <div class="section">
+      <h4>Attention today</h4>
+      ${attentionList()}
+    </div>
+    <div class="section">
+      <h4>Integration status</h4>
+      <div class="row"><span class="k">AppFolio export</span><span class="v" style="color:var(--moss)">● synced 3m ago</span></div>
+      <div class="row"><span class="k">Maintenance queue</span><span class="v" style="color:var(--moss)">● synced 7m ago</span></div>
+      <div class="row"><span class="k">GL / cost ledger</span><span class="v" style="color:var(--amber)">● nightly</span></div>
+      <div class="row"><span class="k">Access logs</span><span class="v" style="color:var(--ink-4)">○ gap identified</span></div>
+    </div>
+  `;
+}
+
+function attentionList(){
+  // find interesting units this month
+  const flagged = [];
+  UNITS.forEach(u=>{
+    const s = u.history[currentMonth];
+    if (s==="in-turn"){
+      // roughly estimate turn days as how many consecutive turn/vacant months
+      let days = 0;
+      for (let m=currentMonth; m>=0 && (u.history[m]==="in-turn"||u.history[m]==="vacant"); m--) days += 18;
+      flagged.push({u, reason:`Turn cycle · ${days}d`, tag:"in-turn"});
+    } else if (s==="delinquent"){
+      flagged.push({u, reason:"Rent 30d+ past due", tag:"delinquent"});
+    } else if (s==="work-order"){
+      const stalled = u.workOrders.find(w=>w.status==="stalled");
+      if (stalled) flagged.push({u, reason:`${stalled.cat} stalled · ${stalled.ageDays}d`, tag:"work-order"});
+    }
+  });
+  flagged.sort((a,b)=>{ const ord={"delinquent":0,"in-turn":1,"work-order":2}; return ord[a.tag]-ord[b.tag];});
+  const top = flagged.slice(0,4);
+  if (top.length===0) return `<div style="color:var(--ink-3);font-size:12px">Nothing flagged. The property is running clean at ${MONTHS[currentMonth]}.</div>`;
+  return top.map(f=>`
+    <div class="row" onclick="window.__selectUnit(${f.u.idx})" style="cursor:pointer">
+      <span class="k">Unit ${f.u.number}</span>
+      <span class="v" style="color:var(--${f.tag==='delinquent'?'rose':f.tag==='in-turn'?'amber':'slate'})">${f.reason}</span>
+    </div>
+  `).join("");
+}
+
+function renderUnitDetail(u){
+  const s = u.history[currentMonth];
+  const statusColor = {
+    occupied:"var(--moss)", vacant:"var(--ghost)", "in-turn":"var(--amber)",
+    "work-order":"var(--slate)", delinquent:"var(--rose)"
+  }[s];
+  const statusLabel = s.replace("-"," ");
+  const openWOs = u.workOrders.filter(w=>w.status!=="closed");
+  const closedWOs = u.workOrders.filter(w=>w.status==="closed");
+
+  return `
+    <div class="unit-head">
+      <div class="eyebrow"><span>Unit Inspector</span><span class="close">close ✕</span></div>
+      <h3>Unit ${u.number}</h3>
+      <div class="addr">FLOOR ${u.floor+1} · ${u.beds} BED · ${u.sqft} SF</div>
+      <div class="status-pill" style="border-color:${statusColor};color:${statusColor}">
+        <span class="sw" style="background:${statusColor}"></span>${statusLabel.toUpperCase()}
+      </div>
+    </div>
+
+    <div class="unit-body">
+      ${ s==="occupied" || s==="delinquent" || s==="work-order" ? `
+        <div class="tenant-card">
+          <div class="avatar">${u.tenant.split(" ").map(s=>s[0]).join("")}</div>
+          <div class="info"><div class="name">${u.tenant}</div>
+            <div class="sub">LEASE START ${u.leaseStart} · ${u.beds}BR</div>
+          </div>
+        </div>
+      ` : `<div style="font-size:12px;color:var(--ink-3);font-style:italic;padding:6px 0">No current occupant.</div>`}
+
+      <div class="row"><span class="k">Current rent</span><span class="v">$${u.rent.toLocaleString()}/mo</span></div>
+      <div class="row"><span class="k">Market estimate</span><span class="v">$${(u.rent + (u.floor*25 + u.beds*40)).toLocaleString()}/mo</span></div>
+      <div class="row"><span class="k">Days in state</span><span class="v">${daysInState(u)}</span></div>
+      <div class="row"><span class="k">Last AppFolio sync</span><span class="v">3m ago</span></div>
+    </div>
+
+    <div class="section">
+      <h4>Work orders · ${u.workOrders.length}</h4>
+      ${u.workOrders.length===0 ? `<div style="font-size:12px;color:var(--ink-3)">No history on record.</div>` :
+        [...openWOs, ...closedWOs].map(w=>`
+          <div class="wo-item">
+            <div class="wo-top"><span>${w.id} · ${w.cat}</span><span class="${w.status}">${w.status.toUpperCase()} · ${w.ageDays}d</span></div>
+            <div class="desc">${w.d}</div>
+          </div>
+        `).join("")
+      }
+    </div>
+
+    <div class="section">
+      <h4>12-month timeline</h4>
+      <div style="display:flex;gap:2px;margin-top:4px">
+        ${u.history.map((h,i)=>{
+          const c = {
+            occupied:"var(--moss)",vacant:"var(--ghost)","in-turn":"var(--amber)",
+            "work-order":"var(--slate)",delinquent:"var(--rose)"
+          }[h];
+          const border = i===currentMonth ? "1.5px solid var(--accent)" : "1px solid transparent";
+          return `<div title="${MONTHS[i]} · ${h}" style="flex:1;height:18px;background:${c};border:${border};cursor:pointer" onclick="window.__setMonth(${i})"></div>`;
+        }).join("")}
+      </div>
+      <div style="display:flex;justify-content:space-between;font-family:'Geist Mono';font-size:9.5px;color:var(--ink-4);margin-top:3px">
+        <span>${MONTHS[0]}</span><span>${MONTHS[N_MONTHS-1]}</span>
+      </div>
+    </div>
+  `;
+}
+
+function daysInState(u){
+  let count = 0;
+  const s = u.history[currentMonth];
+  for (let m=currentMonth; m>=0 && u.history[m]===s; m--) count += 30;
+  return `~${count}d`;
+}
+
+function selectUnit(idx){
+  selectedIdx = idx;
+  highlightSet = null;
+  refreshDetail();
+}
+window.__selectUnit = selectUnit;
+window.__setMonth = setMonth;
+
+/* ============================================================
+   AI ASSISTANT — canned but thoughtful
+   ============================================================ */
+
+const CANNED = {
+  vacancy_risk: ()=>{
+    const atRisk = UNITS.filter(u=>{
+      const s = u.history[currentMonth];
+      if (s!=="in-turn" && s!=="vacant") return false;
+      // count consecutive non-occupied months
+      let c = 0;
+      for (let m=currentMonth; m>=0 && u.history[m]!=="occupied"; m--) c++;
+      return c>=2;
+    });
+    const ids = atRisk.map(u=>u.idx);
+    const numbers = atRisk.map(u=>u.number);
+    return {
+      set: new Set(ids),
+      html: `
+        <p>I found <span class="hl">${atRisk.length} unit${atRisk.length===1?"":"s"}</span> with stalled turn cycles beyond the <span class="hl">14-day threshold</span>. I've surfaced them in the twin.</p>
+        <ul>
+          ${atRisk.map(u=>{
+            let c=0; for (let m=currentMonth; m>=0 && u.history[m]!=="occupied"; m--) c++;
+            const wo = u.workOrders.find(w=>w.status!=="closed");
+            return `<li><span class="cite">${u.number}</span> &nbsp;~${c*30}d idle${wo?` · blocker: <em>${wo.cat.toLowerCase()}</em> (${wo.ageDays}d)`:""}</li>`;
+          }).join("")}
+        </ul>
+        <p>The highest impact is <span class="hl">${atRisk[0]?.number}</span> — at $${atRisk[0]?.rent}/mo, every week idle costs ~$${Math.round((atRisk[0]?.rent||0)/4.3).toLocaleString()}.</p>
+        <div class="footnote">Grounded in AppFolio turn states · maintenance queue · last sync 3m ago.</div>
+      `
+    };
+  },
+
+  month_signal: ()=>{
+    const cur = AGG[currentMonth];
+    const prev = AGG[Math.max(0,currentMonth-1)];
+    const delinqUnits = UNITS.filter(u=>u.history[currentMonth]==="delinquent");
+    const woUnits = UNITS.filter(u=>u.history[currentMonth]==="work-order");
+    const emph = new Set([...delinqUnits, ...woUnits].map(u=>u.idx));
+    return {
+      set: emph,
+      html: `
+        <p><span class="hl">${MONTHS[currentMonth]}</span> at a glance.</p>
+        <ul>
+          <li>Occupancy: <span class="hl">${cur.occupancyPct.toFixed(1)}%</span> (${(cur.occupancyPct-prev.occupancyPct>=0?"+":"")}${(cur.occupancyPct-prev.occupancyPct).toFixed(1)}pt MoM).</li>
+          <li>Turn cycle trending to <span class="hl">${cur.turnDaysAvg.toFixed(1)}d</span> vs an 11.0d target — the drag is concentrated on Floor 2.</li>
+          <li>Delinquency is <span class="hl">${cur.del} unit${cur.del===1?"":"s"}</span> (${cur.delinquencyPct.toFixed(1)}%). Repeat offender: ${delinqUnits[0]?.number || "n/a"}.</li>
+          <li>${cur.wo} open work order${cur.wo===1?"":"s"} — 2 have aged past SLA.</li>
+        </ul>
+        <p>Net: property is <span class="hl">operationally stable</span> but turn velocity is the weakest link this month.</p>
+        <div class="footnote">Human review recommended before any tenant-facing action.</div>
+      `
+    };
+  },
+
+  focus_week: ()=>{
+    const cur = AGG[currentMonth];
+    const actions = [];
+    UNITS.forEach(u=>{
+      const s = u.history[currentMonth];
+      if (s==="in-turn"){
+        let c=0; for (let m=currentMonth; m>=0 && u.history[m]!=="occupied"; m--) c++;
+        if (c>=2) actions.push({unit:u, priority: u.rent*c, action:`Unblock turn — ~${c*30}d idle`, tag:"turn"});
+      }
+      if (s==="delinquent") actions.push({unit:u, priority: u.rent*2.5, action:"Initiate collection workflow", tag:"del"});
+      const stalled = u.workOrders?.find(w=>w.status==="stalled");
+      if (stalled) actions.push({unit:u, priority: stalled.ageDays*100, action:`Escalate ${stalled.cat.toLowerCase()} vendor`, tag:"wo"});
+    });
+    actions.sort((a,b)=>b.priority-a.priority);
+    const top = actions.slice(0,4);
+    return {
+      set: new Set(top.map(a=>a.unit.idx)),
+      html: `
+        <p>Ranked by estimated impact on <span class="hl">NOI this month</span>:</p>
+        <ul>
+          ${top.map((a,i)=>`<li><span class="cite">${i+1}. ${a.unit.number}</span> &nbsp;${a.action}</li>`).join("")}
+        </ul>
+        <p>Addressing the top two alone would recover approximately <span class="hl">$${Math.round((top[0]?.unit.rent+top[1]?.unit.rent||0)/4).toLocaleString()}</span> in avoidable loss this cycle.</p>
+        <div class="footnote">Prioritization weights are tunable — this is a suggestion, not a directive.</div>
+      `
+    };
+  },
+
+  patterns: ()=>{
+    // floor 2 woes
+    const f2wo = UNITS.filter(u=>u.floor===1 && u.workOrders.length>0);
+    const emph = new Set(f2wo.map(u=>u.idx));
+    return {
+      set: emph,
+      html: `
+        <p>Two signals worth surfacing from the 12-month ledger:</p>
+        <ul>
+          <li><span class="hl">Floor 2 is over-represented</span> in maintenance activity — ${f2wo.length} units carry open or historical work orders (${Math.round(f2wo.length/6*100)}% of the floor) vs. a ${Math.round(28)}% property average. Likely a shared system (HVAC or plumbing riser).</li>
+          <li>Work orders touched by vendor <span class="hl">Casa Maintenance</span> resolve ~3.2d slower than portfolio baseline. Worth reviewing contract terms.</li>
+        </ul>
+        <p>Neither is a crisis — but both are the kind of pattern a static dashboard would miss. The twin compounds these observations over time.</p>
+        <div class="footnote">Pattern detection runs nightly · thresholds are configurable.</div>
+      `
+    };
+  }
+};
+
+const thread = document.getElementById("thread");
+
+document.querySelectorAll(".chip").forEach(c=>{
+  c.addEventListener("click", ()=>{
+    document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
+    c.classList.add("active");
+    const q = c.dataset.q;
+    runQuery(q, c.textContent.replace(/^\d+/,"").trim());
+  });
+});
+
+function runQuery(key, label){
+  // user message
+  const userMsg = document.createElement("div");
+  userMsg.className = "msg user";
+  userMsg.textContent = label;
+  thread.appendChild(userMsg);
+
+  // typing indicator
+  const tMsg = document.createElement("div");
+  tMsg.className = "msg claude";
+  tMsg.innerHTML = `<div class="who">Twin · thinking</div><div class="typing"><span></span><span></span><span></span></div>`;
+  thread.appendChild(tMsg);
+  thread.scrollTop = thread.scrollHeight;
+
+  setTimeout(()=>{
+    const {set, html} = CANNED[key]();
+    highlightSet = set;
+    tMsg.innerHTML = `<div class="who">Twin · response</div>${html}`;
+    thread.scrollTop = thread.scrollHeight;
+  }, 900);
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+
+setTimeout(()=>{ updateScrubber(); }, 50);
+window.addEventListener("resize", ()=>setTimeout(updateScrubber, 30));
+
+setMonth(CURRENT_M);
+refreshDetail();
+updateCharts();
+
+// clear highlight when clicking empty stage (double-click)
+renderer.domElement.addEventListener("dblclick", ()=>{ highlightSet = null; selectedIdx = -1; refreshDetail();
+  document.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
+});
+
+</script>
+</body>
+</html>
