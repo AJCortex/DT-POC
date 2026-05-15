@@ -765,6 +765,35 @@
 </style>
 </head>
 <body>
+<!-- PASSWORD GATE -->
+<div id="gate" style="position:fixed;inset:0;z-index:9999;background:#0d0d0b;display:flex;align-items:center;justify-content:center;font-family:'Inter Tight',system-ui,sans-serif;">
+  <div style="text-align:center;max-width:320px;width:90%;">
+    <div style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#6A5F55;margin-bottom:32px;font-family:'Geist Mono',monospace;">Twin Axis Studio &middot; Demo Portal</div>
+    <div style="font-family:'Fraunces',Georgia,serif;font-size:28px;font-weight:300;font-style:italic;color:#EAEEE8;margin-bottom:8px;letter-spacing:-0.01em;">Access Required</div>
+    <div style="font-size:13px;color:#6A5F55;margin-bottom:32px;">Enter your access code to continue.</div>
+    <input id="gateInput" type="password" placeholder="Access code" autocomplete="off" style="width:100%;padding:14px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#EAEEE8;font-size:14px;outline:none;text-align:center;letter-spacing:0.1em;font-family:'Geist Mono',monospace;transition:border-color 0.2s;" onkeydown="if(event.key==='Enter')checkPass()" onfocus="this.style.borderColor='rgba(74,59,138,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'"/>
+    <div id="gateError" style="font-size:11px;color:#ff5555;margin-top:10px;opacity:0;transition:opacity 0.2s;height:16px;">Incorrect access code.</div>
+    <button onclick="checkPass()" style="margin-top:16px;width:100%;padding:14px;background:#4A3B8A;border:none;border-radius:8px;color:#EAEEE8;font-size:13px;font-weight:500;letter-spacing:0.06em;cursor:pointer;font-family:'Inter Tight',sans-serif;transition:background 0.2s;" onmouseover="this.style.background='#5B4AA0'" onmouseout="this.style.background='#4A3B8A'">Enter</button>
+  </div>
+</div>
+<script>
+  (function(){if(sessionStorage.getItem('ta_auth')==='1'){document.getElementById('gate').style.display='none';}})();
+  function checkPass(){
+    var val=document.getElementById('gateInput').value;
+    if(val==='BuildFast'){
+      sessionStorage.setItem('ta_auth','1');
+      var gate=document.getElementById('gate');
+      gate.style.transition='opacity 0.4s';gate.style.opacity='0';
+      setTimeout(function(){gate.style.display='none';},400);
+    } else {
+      var err=document.getElementById('gateError');
+      err.style.opacity='1';
+      document.getElementById('gateInput').style.borderColor='rgba(255,80,80,0.5)';
+      setTimeout(function(){err.style.opacity='0';document.getElementById('gateInput').style.borderColor='rgba(255,255,255,0.1)';},2500);
+    }
+  }
+</script>
+<!-- END GATE -->
 
 <!-- HEADER -->
 <header>
