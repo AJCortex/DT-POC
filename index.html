@@ -278,6 +278,8 @@
   .tag-re { background: rgba(45,190,124,0.12); color: #1A9060; }
   .tag-env { background: rgba(0,145,255,0.1); color: #0066CC; }
   .tag-iot { background: rgba(255,120,0,0.1); color: #CC5500; }
+  .tag-mm { background: rgba(0,160,200,0.1); color: #006080; }
+  .card-preview.fairplex { background: #090e18; }
 
   .card-live {
     display: flex;
@@ -513,24 +515,32 @@
       </div>
     </a>
 
-    <div class="card fade-up" style="cursor:default;opacity:0.6;">
-      <div class="card-preview tba">
-        <div class="tba-inner">
-          <div class="tba-icon">&#9678;</div>
-          <div class="tba-label">In Development</div>
-        </div>
+    <a class="card fade-up" href="/fairplex/" target="_blank">
+      <div class="card-preview fairplex">
+        <canvas id="fairplexCanvas" style="position:absolute;inset:0;width:100%;height:100%;"></canvas>
       </div>
       <div class="card-body">
         <div class="card-meta">
-          <div class="card-tags"><span class="tag tag-dt">Digital Twin</span></div>
+          <div class="card-tags">
+            <span class="tag tag-dt">Digital Twin</span>
+            <span class="tag tag-mm">Multimodal</span>
+            <span class="tag tag-iot">Live Feeds</span>
+          </div>
+          <div class="card-live"><div class="card-live-dot"></div>Live</div>
         </div>
-        <div class="card-title">Next <em>Pilot</em></div>
-        <div class="card-desc">A new operational model is in development. Contact Twin Axis Studio to discuss your project or request early access to an upcoming demo.</div>
+        <div class="card-title">Fairplex <em>Arrival Intelligence</em></div>
+        <div class="card-desc">Event-day operational console for the Pomona Fairplex corridor. GTFS-RT integration, MassMotion-derived pedestrian simulation, and scenario modeling for the City of Pomona.</div>
         <div class="card-footer">
-          <div class="card-location">twinaxisstudio.com</div>
+          <div class="card-location">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><circle cx="5" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M5 10C5 10 1.5 6.5 1.5 4C1.5 2.07 3.07.5 5 .5C6.93.5 8.5 2.07 8.5 4C8.5 6.5 5 10 5 10Z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+            Pilot Concept · City of Pomona
+          </div>
+          <div class="card-arrow">
+            <svg viewBox="0 0 12 12"><line x1="2" y1="10" x2="10" y2="2"/><polyline points="4,2 10,2 10,8"/></svg>
+          </div>
         </div>
       </div>
-    </div>
+    </a>
 
   </div>
 
@@ -635,6 +645,115 @@ document.getElementById('footerDate').textContent =
     ctx.fillStyle=sg;ctx.fillRect(0,scanY-30,W,60);
     ctx.fillStyle='rgba(255,80,80,0.8)';ctx.font='10px "Geist Mono",monospace';ctx.fillText('CRITICAL  47.3t / DAY',18,H-12);
     ctx.fillStyle='rgba(0,180,255,0.5)';ctx.font='10px "Geist Mono",monospace';ctx.fillText('25KM CORRIDOR',W-100,H-12);
+    frame++;requestAnimationFrame(draw);
+  }
+  draw();
+  window.addEventListener('resize',resize);
+})();
+
+// Fairplex canvas -- transit/crowd/multimodal feel
+(function(){
+  const canvas=document.getElementById('fairplexCanvas');
+  if(!canvas) return;
+  const ctx=canvas.getContext('2d');
+  let frame=0;
+  function resize(){canvas.width=canvas.offsetWidth;canvas.height=canvas.offsetHeight;}
+  resize();
+
+  // Transit vehicles
+  const vehicles=[
+    {x:0,y:0.3,speed:0.0018,color:'#00C8FF',label:'BUS 482',len:18,h:7},
+    {x:0.3,y:0.52,speed:0.0012,color:'#FFB020',label:'SHUTTLE',len:14,h:6},
+    {x:0.6,y:0.7,speed:0.0022,color:'#00C8FF',label:'BUS 483',len:18,h:7},
+  ];
+
+  // Pedestrian agents (MassMotion-style dots)
+  const agents=Array.from({length:55},(_,i)=>({
+    x:Math.random(),y:0.2+Math.random()*0.65,
+    vx:(Math.random()-0.5)*0.0008,vy:(Math.random()-0.5)*0.0004,
+    r:1.5+(Math.random()*1.2),
+    hue:Math.random()>0.85?40:200,
+  }));
+
+  function draw(){
+    const W=canvas.width,H=canvas.height;
+    ctx.clearRect(0,0,W,H);
+
+    // Dark map BG
+    ctx.fillStyle='#090e18';ctx.fillRect(0,0,W,H);
+
+    // Grid / street network
+    ctx.strokeStyle='rgba(0,180,255,0.06)';ctx.lineWidth=1;
+    for(let x=0;x<W;x+=W/8){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=H/6){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    // Road corridors
+    const roads=[{y:0.30,w:0.04},{y:0.52,w:0.035},{y:0.70,w:0.04}];
+    roads.forEach(r=>{
+      const ry=r.y*H,rh=r.w*H;
+      const rg=ctx.createLinearGradient(0,ry-rh/2,0,ry+rh/2);
+      rg.addColorStop(0,'rgba(0,180,255,0)');
+      rg.addColorStop(0.5,'rgba(0,180,255,0.07)');
+      rg.addColorStop(1,'rgba(0,180,255,0)');
+      ctx.fillStyle=rg;ctx.fillRect(0,ry-rh/2,W,rh);
+      ctx.strokeStyle='rgba(0,180,255,0.15)';ctx.lineWidth=1;ctx.setLineDash([6,8]);
+      ctx.beginPath();ctx.moveTo(0,ry);ctx.lineTo(W,ry);ctx.stroke();
+      ctx.setLineDash([]);
+    });
+
+    // Pedestrian agents
+    agents.forEach(a=>{
+      a.x+=a.vx;a.y+=a.vy;
+      if(a.x<0)a.x=1;if(a.x>1)a.x=0;
+      if(a.y<0.18)a.vy=Math.abs(a.vy);
+      if(a.y>0.88)a.vy=-Math.abs(a.vy);
+      const ax=a.x*W,ay=a.y*H;
+      const alpha=0.5+Math.sin(frame*0.04+a.x*10)*0.2;
+      ctx.beginPath();ctx.arc(ax,ay,a.r,0,Math.PI*2);
+      ctx.fillStyle=`hsla(${a.hue},80%,70%,${alpha})`;ctx.fill();
+    });
+
+    // Transit vehicles (moving left to right)
+    vehicles.forEach(v=>{
+      v.x=(v.x+v.speed)%1.1;
+      const vx=v.x*W,vy=v.y*H;
+      // glow
+      const vg=ctx.createRadialGradient(vx,vy,0,vx,vy,v.len*1.8);
+      vg.addColorStop(0,v.color.replace('FF','88')+'44');
+      vg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=vg;ctx.beginPath();ctx.arc(vx,vy,v.len*1.8,0,Math.PI*2);ctx.fill();
+      // body
+      ctx.fillStyle=v.color;ctx.globalAlpha=0.9;
+      ctx.beginPath();ctx.roundRect(vx-v.len/2,vy-v.h/2,v.len,v.h,2);ctx.fill();
+      ctx.globalAlpha=1;
+      // label
+      ctx.fillStyle='rgba(0,200,255,0.5)';ctx.font=`7px "Geist Mono",monospace`;
+      ctx.fillText(v.label,vx-v.len/2,vy-v.h/2-3);
+    });
+
+    // Hotspot rings (entry nodes)
+    [{x:0.15,y:0.5},{x:0.5,y:0.42},{x:0.82,y:0.55}].forEach((pt,pi)=>{
+      const px=pt.x*W,py=pt.y*H;
+      const pulse=1+0.3*Math.sin(frame*0.05+pi*1.2);
+      ctx.beginPath();ctx.arc(px,py,10*pulse,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(0,200,255,${0.4-pi*0.08})`;ctx.lineWidth=1.5;ctx.stroke();
+      ctx.beginPath();ctx.arc(px,py,3,0,Math.PI*2);
+      ctx.fillStyle='#00C8FF';ctx.fill();
+    });
+
+    // Scan line
+    const scanY=(frame*0.8)%H;
+    const sg=ctx.createLinearGradient(0,scanY-20,0,scanY+20);
+    sg.addColorStop(0,'rgba(0,180,255,0)');sg.addColorStop(0.5,'rgba(0,180,255,0.05)');sg.addColorStop(1,'rgba(0,180,255,0)');
+    ctx.fillStyle=sg;ctx.fillRect(0,scanY-20,W,40);
+
+    // Labels
+    ctx.fillStyle='rgba(0,200,255,0.5)';ctx.font='10px "Geist Mono",monospace';
+    ctx.fillText('GTFS-RT LIVE',18,H-12);
+    const crowd=Math.round(4200+Math.sin(frame*0.02)*180);
+    ctx.fillStyle='rgba(255,176,32,0.7)';ctx.font='10px "Geist Mono",monospace';
+    ctx.fillText(`${crowd.toLocaleString()} PAX`,W-90,H-12);
+
     frame++;requestAnimationFrame(draw);
   }
   draw();
