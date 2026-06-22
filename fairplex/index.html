@@ -12,8 +12,18 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: #0a0e1a; }
-  #root { min-height: 100vh; display: none; }
-  #root.unlocked { display: block; }
+  /* Render dashboard into normally-sized container but hide visually until gate unlocks.
+     This lets Recharts measure container width correctly. */
+  #root {
+    min-height: 100vh;
+    visibility: hidden;
+    position: absolute;
+    top: 0; left: 0; right: 0;
+  }
+  #root.unlocked {
+    visibility: visible;
+    position: static;
+  }
 
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
   @keyframes blink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
@@ -356,8 +366,10 @@
     if (ACCESS_CODES.has(code)) {
       gate.classList.add('hidden');
       root.classList.add('unlocked');
-      // Initialize dashboard now that it's visible
-      if (window.__initDashboard) window.__initDashboard();
+      // Notify dashboard it's now visible so it can re-measure (Recharts needs this)
+      window.dispatchEvent(new Event('resize'));
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
+      setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
     } else {
       pwInput.classList.add('error');
       errorEl.classList.add('visible');
