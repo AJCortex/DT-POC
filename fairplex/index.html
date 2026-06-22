@@ -402,27 +402,153 @@
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"></script>
 <script crossorigin src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-<script type="text/babel" data-presets="react">
-const { useState, useEffect, useMemo } = React;
-const { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Area, AreaChart } = Recharts;
-
-const Icon = ({ children, size = 16, color = 'currentColor' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">{children}</svg>
-);
-const Train = (p) => <Icon {...p}><rect x="4" y="3" width="16" height="16" rx="2"/><path d="M4 11h16"/><path d="M12 3v8"/><path d="m8 19-2 3"/><path d="m18 22-2-3"/><path d="M8 15h.01"/><path d="M16 15h.01"/></Icon>;
-const MapPin = (p) => <Icon {...p}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></Icon>;
-const Users = (p) => <Icon {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></Icon>;
-const Car = (p) => <Icon {...p}><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></Icon>;
-const Wind = (p) => <Icon {...p}><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></Icon>;
-const AlertCircle = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></Icon>;
-const TrendingDown = (p) => <Icon {...p}><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></Icon>;
-const Activity = (p) => <Icon {...p}><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></Icon>;
-const ArrowDownToLine = (p) => <Icon {...p}><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></Icon>;
-const ArrowUpFromLine = (p) => <Icon {...p}><path d="m18 9-6-6-6 6"/><path d="M12 3v14"/><path d="M5 21h14"/></Icon>;
-const Calendar = (p) => <Icon {...p}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></Icon>;
-
+<script>
+const {
+  useState,
+  useEffect,
+  useMemo
+} = React;
+const {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ResponsiveContainer,
+  Area,
+  AreaChart
+} = Recharts;
+const Icon = ({
+  children,
+  size = 16,
+  color = 'currentColor'
+}) => /*#__PURE__*/React.createElement("svg", {
+  width: size,
+  height: size,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: color,
+  strokeWidth: "2",
+  strokeLinecap: "round",
+  strokeLinejoin: "round"
+}, children);
+const Train = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("rect", {
+  x: "4",
+  y: "3",
+  width: "16",
+  height: "16",
+  rx: "2"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M4 11h16"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M12 3v8"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "m8 19-2 3"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "m18 22-2-3"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M8 15h.01"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M16 15h.01"
+}));
+const MapPin = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("path", {
+  d: "M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"
+}), /*#__PURE__*/React.createElement("circle", {
+  cx: "12",
+  cy: "10",
+  r: "3"
+}));
+const Users = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("path", {
+  d: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+}), /*#__PURE__*/React.createElement("circle", {
+  cx: "9",
+  cy: "7",
+  r: "4"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M22 21v-2a4 4 0 0 0-3-3.87"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M16 3.13a4 4 0 0 1 0 7.75"
+}));
+const Car = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("path", {
+  d: "M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"
+}), /*#__PURE__*/React.createElement("circle", {
+  cx: "7",
+  cy: "17",
+  r: "2"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M9 17h6"
+}), /*#__PURE__*/React.createElement("circle", {
+  cx: "17",
+  cy: "17",
+  r: "2"
+}));
+const Wind = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("path", {
+  d: "M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M9.6 4.6A2 2 0 1 1 11 8H2"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M12.6 19.4A2 2 0 1 0 14 16H2"
+}));
+const AlertCircle = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("circle", {
+  cx: "12",
+  cy: "12",
+  r: "10"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "12",
+  y1: "8",
+  x2: "12",
+  y2: "12"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "12",
+  y1: "16",
+  x2: "12.01",
+  y2: "16"
+}));
+const TrendingDown = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("polyline", {
+  points: "22 17 13.5 8.5 8.5 13.5 2 7"
+}), /*#__PURE__*/React.createElement("polyline", {
+  points: "16 17 22 17 22 11"
+}));
+const Activity = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("polyline", {
+  points: "22 12 18 12 15 21 9 3 6 12 2 12"
+}));
+const ArrowDownToLine = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("path", {
+  d: "M12 17V3"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "m6 11 6 6 6-6"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M19 21H5"
+}));
+const ArrowUpFromLine = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("path", {
+  d: "m18 9-6-6-6 6"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M12 3v14"
+}), /*#__PURE__*/React.createElement("path", {
+  d: "M5 21h14"
+}));
+const Calendar = p => /*#__PURE__*/React.createElement(Icon, p, /*#__PURE__*/React.createElement("rect", {
+  width: "18",
+  height: "18",
+  x: "3",
+  y: "4",
+  rx: "2",
+  ry: "2"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "16",
+  x2: "16",
+  y1: "2",
+  y2: "6"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "8",
+  x2: "8",
+  y1: "2",
+  y2: "6"
+}), /*#__PURE__*/React.createElement("line", {
+  x1: "3",
+  x2: "21",
+  y1: "10",
+  y2: "10"
+}));
 function PomonaFairplexDashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [attendance, setAttendance] = useState(50000);
@@ -430,73 +556,176 @@ function PomonaFairplexDashboard() {
   const [shuttleFreq, setShuttleFreq] = useState(15);
   const [selectedTrain, setSelectedTrain] = useState(null);
   const [activePreset, setActivePreset] = useState('baseline');
-
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
-
   const presets = {
-    baseline: { label: 'Baseline', sublabel: 'Typical Day', attendance: 15000, transitShare: 8, shuttleFreq: 20, accent: '#5a6478' },
-    countyFair: { label: 'LA County Fair', sublabel: 'Saturday Peak', attendance: 110000, transitShare: 12, shuttleFreq: 10, accent: '#ff8a00' },
-    nhra: { label: 'NHRA Winternats', sublabel: 'Sunday Finals', attendance: 45000, transitShare: 15, shuttleFreq: 12, accent: '#ff4444' },
-    tradeShow: { label: 'Trade Show', sublabel: 'Weekday', attendance: 25000, transitShare: 22, shuttleFreq: 15, accent: '#00b8d9' },
+    baseline: {
+      label: 'Baseline',
+      sublabel: 'Typical Day',
+      attendance: 15000,
+      transitShare: 8,
+      shuttleFreq: 20,
+      accent: '#5a6478'
+    },
+    countyFair: {
+      label: 'LA County Fair',
+      sublabel: 'Saturday Peak',
+      attendance: 110000,
+      transitShare: 12,
+      shuttleFreq: 10,
+      accent: '#ff8a00'
+    },
+    nhra: {
+      label: 'NHRA Winternats',
+      sublabel: 'Sunday Finals',
+      attendance: 45000,
+      transitShare: 15,
+      shuttleFreq: 12,
+      accent: '#ff4444'
+    },
+    tradeShow: {
+      label: 'Trade Show',
+      sublabel: 'Weekday',
+      attendance: 25000,
+      transitShare: 22,
+      shuttleFreq: 15,
+      accent: '#00b8d9'
+    }
   };
-
-  const applyPreset = (key) => {
+  const applyPreset = key => {
     const p = presets[key];
     setAttendance(p.attendance);
     setTransitShare(p.transitShare);
     setShuttleFreq(p.shuttleFreq);
     setActivePreset(key);
   };
-
   const handleSliderChange = (setter, value) => {
     setter(value);
     setActivePreset('custom');
   };
-
-  const allTrains = useMemo(() => [
-    { id: 'ML-318', agency: 'Metrolink', line: 'San Bernardino Line', direction: 'Eastbound', destination: 'San Bernardino', origin: 'L.A. Union Station', eta: 4, platform: '2', status: 'On Time', delay: 0, inbound: true, capacity: 600 },
-    { id: 'A-247', agency: 'Metro', line: 'A Line', direction: 'Eastbound', destination: 'APU/Citrus', origin: 'Long Beach', eta: 7, platform: '1', status: 'On Time', delay: 0, inbound: true, capacity: 450 },
-    { id: 'ML-321', agency: 'Metrolink', line: 'San Bernardino Line', direction: 'Westbound', destination: 'L.A. Union Station', origin: 'San Bernardino', eta: 12, platform: '3', status: 'Delayed', delay: 3, inbound: false, capacity: 600 },
-    { id: 'A-248', agency: 'Metro', line: 'A Line', direction: 'Westbound', destination: 'Long Beach', origin: 'APU/Citrus', eta: 14, platform: '4', status: 'On Time', delay: 0, inbound: false, capacity: 450 },
-    { id: 'ML-323', agency: 'Metrolink', line: 'San Bernardino Line', direction: 'Eastbound', destination: 'San Bernardino', origin: 'L.A. Union Station', eta: 22, platform: '2', status: 'On Time', delay: 0, inbound: true, capacity: 600 },
-    { id: 'A-251', agency: 'Metro', line: 'A Line', direction: 'Eastbound', destination: 'APU/Citrus', origin: 'Long Beach', eta: 27, platform: '1', status: 'On Time', delay: 0, inbound: true, capacity: 450 },
-    { id: 'A-253', agency: 'Metro', line: 'A Line', direction: 'Westbound', destination: 'Long Beach', origin: 'APU/Citrus', eta: 31, platform: '4', status: 'On Time', delay: 0, inbound: false, capacity: 450 },
-  ], []);
-
+  const allTrains = useMemo(() => [{
+    id: 'ML-318',
+    agency: 'Metrolink',
+    line: 'San Bernardino Line',
+    direction: 'Eastbound',
+    destination: 'San Bernardino',
+    origin: 'L.A. Union Station',
+    eta: 4,
+    platform: '2',
+    status: 'On Time',
+    delay: 0,
+    inbound: true,
+    capacity: 600
+  }, {
+    id: 'A-247',
+    agency: 'Metro',
+    line: 'A Line',
+    direction: 'Eastbound',
+    destination: 'APU/Citrus',
+    origin: 'Long Beach',
+    eta: 7,
+    platform: '1',
+    status: 'On Time',
+    delay: 0,
+    inbound: true,
+    capacity: 450
+  }, {
+    id: 'ML-321',
+    agency: 'Metrolink',
+    line: 'San Bernardino Line',
+    direction: 'Westbound',
+    destination: 'L.A. Union Station',
+    origin: 'San Bernardino',
+    eta: 12,
+    platform: '3',
+    status: 'Delayed',
+    delay: 3,
+    inbound: false,
+    capacity: 600
+  }, {
+    id: 'A-248',
+    agency: 'Metro',
+    line: 'A Line',
+    direction: 'Westbound',
+    destination: 'Long Beach',
+    origin: 'APU/Citrus',
+    eta: 14,
+    platform: '4',
+    status: 'On Time',
+    delay: 0,
+    inbound: false,
+    capacity: 450
+  }, {
+    id: 'ML-323',
+    agency: 'Metrolink',
+    line: 'San Bernardino Line',
+    direction: 'Eastbound',
+    destination: 'San Bernardino',
+    origin: 'L.A. Union Station',
+    eta: 22,
+    platform: '2',
+    status: 'On Time',
+    delay: 0,
+    inbound: true,
+    capacity: 600
+  }, {
+    id: 'A-251',
+    agency: 'Metro',
+    line: 'A Line',
+    direction: 'Eastbound',
+    destination: 'APU/Citrus',
+    origin: 'Long Beach',
+    eta: 27,
+    platform: '1',
+    status: 'On Time',
+    delay: 0,
+    inbound: true,
+    capacity: 450
+  }, {
+    id: 'A-253',
+    agency: 'Metro',
+    line: 'A Line',
+    direction: 'Westbound',
+    destination: 'Long Beach',
+    origin: 'APU/Citrus',
+    eta: 31,
+    platform: '4',
+    status: 'On Time',
+    delay: 0,
+    inbound: false,
+    capacity: 450
+  }], []);
   const CORRIDOR_MINUTES = 10;
-
   const eventGoerLoad = (capacity, inbound) => {
     if (!inbound) return 0;
     const baselineLoadFactor = 0.15;
-    const scenarioBoost = (transitShare / 100) * 1.8;
+    const scenarioBoost = transitShare / 100 * 1.8;
     const loadFactor = Math.min(0.60, baselineLoadFactor + scenarioBoost);
     return Math.round(capacity * loadFactor);
   };
-
   const inboundTrains = allTrains.filter(t => t.inbound);
   const departingTrains = allTrains.filter(t => !t.inbound);
-
   const arrivalCurve = useMemo(() => {
     const transitAttendees = attendance * (transitShare / 100);
     const vehicleAttendees = attendance * (1 - transitShare / 100);
     const peopleByCar = vehicleAttendees / 2.5;
-    return Array.from({ length: 12 }, (_, i) => {
+    return Array.from({
+      length: 12
+    }, (_, i) => {
       const hourOffset = i - 2;
       const arrivalPct = Math.exp(-Math.pow(hourOffset + 1, 2) / 4) / 2.5;
       return {
         time: hourOffset <= 0 ? `T${hourOffset}h` : `T+${hourOffset}h`,
         transit: Math.round(transitAttendees * arrivalPct),
         vehicle: Math.round(peopleByCar * arrivalPct),
-        gate: Math.round((transitAttendees + vehicleAttendees) * arrivalPct),
+        gate: Math.round((transitAttendees + vehicleAttendees) * arrivalPct)
       };
     });
   }, [attendance, transitShare]);
-
   const kpis = useMemo(() => {
-    const vehiclesRemoved = Math.round((attendance * (transitShare / 100)) / 2.5);
+    const vehiclesRemoved = Math.round(attendance * (transitShare / 100) / 2.5);
     const peakGateFlow = Math.max(...arrivalCurve.map(d => d.gate));
     const co2SavedKg = Math.round(vehiclesRemoved * 18 * 0.404);
     const queuePeakMinutes = Math.round(peakGateFlow / 1200);
@@ -505,314 +734,1048 @@ function PomonaFairplexDashboard() {
       peakGateFlow,
       co2SavedKg,
       queuePeakMinutes,
-      shuttleCapacity: Math.round((60 / shuttleFreq) * 40),
+      shuttleCapacity: Math.round(60 / shuttleFreq * 40)
     };
   }, [attendance, transitShare, shuttleFreq, arrivalCurve]);
-
-  const formatTime = (date) => date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-
-  return (
-    <div style={{
+  const formatTime = date => date.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
       fontFamily: "'JetBrains Mono', 'IBM Plex Mono', monospace",
       background: '#0a0e1a',
       color: '#e4e7ed',
       minHeight: '100vh',
       padding: '24px',
-      backgroundImage: 'radial-gradient(circle at 20% 0%, rgba(255, 138, 0, 0.04) 0%, transparent 50%), radial-gradient(circle at 80% 100%, rgba(0, 184, 217, 0.03) 0%, transparent 50%)',
-    }}>
-
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid #1a2030', paddingBottom: '20px', marginBottom: '24px' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-            <div className="pulse-dot" style={{ width: '8px', height: '8px', background: '#00ff88', borderRadius: '50%' }}></div>
-            <span style={{ fontSize: '10px', letterSpacing: '0.2em', color: '#5a6478', textTransform: 'uppercase' }}>Live Operations Feed</span>
-          </div>
-          <h1 style={{ fontFamily: "'Fraunces', serif", fontWeight: 300, fontSize: '38px', margin: 0, letterSpacing: '-0.02em', color: '#f5f1e8' }}>
-            Fairplex Arrival Intelligence
-          </h1>
-          <div style={{ fontSize: '11px', color: '#5a6478', marginTop: '4px', letterSpacing: '0.05em' }}>
-            POMONA NORTH STATION → FAIRPLEX CORRIDOR / CITY OF POMONA OPERATIONS CONSOLE
-          </div>
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '32px', fontWeight: 500, color: '#ff8a00', letterSpacing: '0.05em' }}>
-            {formatTime(currentTime)}<span className="cursor-blink">_</span>
-          </div>
-          <div style={{ fontSize: '10px', color: '#5a6478', letterSpacing: '0.15em' }}>
-            PACIFIC / {currentTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase()}
-          </div>
-        </div>
-      </div>
-
-      {/* Preset Bar */}
-      <div style={{ display: 'grid', gridTemplateColumns: '180px repeat(4, 1fr)', gap: '1px', background: '#1a2030', marginBottom: '24px', border: '1px solid #1a2030' }}>
-        <div style={{ background: '#0d1220', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Calendar size={14} color="#ff8a00" />
-          <div>
-            <div style={{ fontSize: '9px', color: '#5a6478', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Event Profile</div>
-            <div style={{ fontSize: '11px', color: activePreset === 'custom' ? '#ffaa00' : '#e4e7ed', letterSpacing: '0.05em', marginTop: '2px', fontWeight: 600 }}>
-              {activePreset === 'custom' ? 'CUSTOM' : presets[activePreset]?.label.toUpperCase()}
-            </div>
-          </div>
-        </div>
-        {Object.entries(presets).map(([key, p]) => {
-          const isActive = activePreset === key;
-          return (
-            <div key={key} className="preset-btn" onClick={() => applyPreset(key)} style={{ background: isActive ? '#141a2a' : '#0d1220', padding: '16px 20px', borderLeft: isActive ? `2px solid ${p.accent}` : '2px solid transparent', position: 'relative' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 600, color: isActive ? p.accent : '#e4e7ed', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-                  {p.label}
-                </span>
-                {isActive && <div className="pulse-dot" style={{ width: '6px', height: '6px', background: p.accent, borderRadius: '50%' }}></div>}
-              </div>
-              <div style={{ fontSize: '9px', color: '#5a6478', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px' }}>{p.sublabel}</div>
-              <div style={{ display: 'flex', gap: '12px', fontSize: '9px', color: '#8a94a8' }}>
-                <span>{(p.attendance / 1000).toFixed(0)}K</span>
-                <span style={{ color: '#5a6478' }}>·</span>
-                <span>{p.transitShare}% TRANSIT</span>
-                <span style={{ color: '#5a6478' }}>·</span>
-                <span>{p.shuttleFreq}M HEADWAY</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* KPI Strip */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '1px', background: '#1a2030', marginBottom: '24px', border: '1px solid #1a2030' }}>
-        {[
-          { label: 'Vehicles Removed', value: kpis.vehiclesRemoved.toLocaleString(), unit: 'cars', icon: Car, accent: '#00ff88' },
-          { label: 'Peak Gate Flow', value: kpis.peakGateFlow.toLocaleString(), unit: 'ppl/hr', icon: Users, accent: '#ff8a00' },
-          { label: 'Queue Peak Est.', value: kpis.queuePeakMinutes, unit: 'min wait', icon: AlertCircle, accent: kpis.queuePeakMinutes > 15 ? '#ff4444' : '#ffaa00' },
-          { label: 'CO₂ Avoided', value: (kpis.co2SavedKg / 1000).toFixed(1), unit: 'metric tons', icon: Wind, accent: '#00b8d9' },
-          { label: 'Shuttle Capacity', value: kpis.shuttleCapacity, unit: 'pax/hr', icon: TrendingDown, accent: '#e4e7ed' },
-        ].map((kpi, i) => (
-          <div key={i} className="scan-line" style={{ background: '#0d1220', padding: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-              <span style={{ fontSize: '9px', color: '#5a6478', letterSpacing: '0.15em', textTransform: 'uppercase' }}>{kpi.label}</span>
-              <kpi.icon size={14} color={kpi.accent} />
-            </div>
-            <div style={{ fontFamily: "'Fraunces', serif", fontSize: '34px', fontWeight: 500, color: kpi.accent, lineHeight: 1, letterSpacing: '-0.02em' }}>
-              {kpi.value}
-            </div>
-            <div style={{ fontSize: '10px', color: '#5a6478', marginTop: '6px', letterSpacing: '0.1em' }}>{kpi.unit.toUpperCase()}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Main Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: '440px 1fr 340px', gap: '1px', background: '#1a2030', border: '1px solid #1a2030' }}>
-
-        {/* LEFT */}
-        <div style={{ background: '#0d1220', padding: '24px' }}>
-          <div style={{ marginBottom: '28px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <ArrowDownToLine size={16} color="#ff8a00" />
-                <span style={{ fontSize: '11px', letterSpacing: '0.2em', color: '#e4e7ed', textTransform: 'uppercase', fontWeight: 600 }}>Inbound · Event-Goers</span>
-              </div>
-              <span style={{ fontSize: '9px', color: '#5a6478', letterSpacing: '0.1em' }}>GTFS-RT</span>
-            </div>
-            <div style={{ fontSize: '9px', color: '#5a6478', marginBottom: '14px', letterSpacing: '0.05em' }}>ARRIVING POMONA NORTH → CORRIDOR TO FAIRPLEX</div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '64px 1fr 48px 76px', gap: '8px', padding: '8px 0', borderBottom: '1px solid #1a2030', fontSize: '8px', color: '#5a6478', letterSpacing: '0.15em', textTransform: 'uppercase' }}>
-              <span>Train</span>
-              <span>From</span>
-              <span style={{ textAlign: 'right' }}>ETA</span>
-              <span style={{ textAlign: 'right' }}>Gate ETA</span>
-            </div>
-
-            {inboundTrains.map((train) => {
-              const eventGoers = eventGoerLoad(train.capacity, train.inbound);
-              const gateEta = train.eta + CORRIDOR_MINUTES + (train.delay || 0);
-              const isImminent = train.eta < 5;
-              return (
-                <div key={train.id} onClick={() => setSelectedTrain(train.id === selectedTrain ? null : train.id)} style={{ padding: '12px 0', borderBottom: '1px solid #1a2030', cursor: 'pointer', background: selectedTrain === train.id ? '#141a2a' : 'transparent', paddingLeft: selectedTrain === train.id ? '12px' : '0', borderLeft: selectedTrain === train.id ? '2px solid #ff8a00' : '2px solid transparent', transition: 'all 0.15s ease' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '64px 1fr 48px 76px', gap: '8px', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontSize: '10px', fontWeight: 600, color: train.agency === 'Metrolink' ? '#00b8d9' : '#ff8a00', letterSpacing: '0.05em' }}>{train.id}</div>
-                      <div style={{ fontSize: '8px', color: '#5a6478', letterSpacing: '0.05em' }}>PLT {train.platform}</div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: '11px', color: '#e4e7ed' }}>{train.origin}</div>
-                      <div style={{ fontSize: '9px', color: '#ff8a00', marginTop: '2px' }}>~{eventGoers} event-goers</div>
-                    </div>
-                    <div style={{ textAlign: 'right' }}>
-                      <span style={{ fontFamily: "'Fraunces', serif", fontSize: '20px', fontWeight: 500, color: isImminent ? '#ff8a00' : '#e4e7ed', lineHeight: 1 }}>{train.eta}</span>
-                      <span style={{ fontSize: '8px', color: '#5a6478', marginLeft: '2px' }}>M</span>
-                      {train.status === 'Delayed' && <div style={{ fontSize: '8px', color: '#ffaa00', marginTop: '2px' }}>+{train.delay}m</div>}
-                    </div>
-                    <div style={{ textAlign: 'right', padding: '6px 8px', background: 'rgba(255, 138, 0, 0.08)', borderLeft: '2px solid #ff8a00' }}>
-                      <div style={{ fontFamily: "'Fraunces', serif", fontSize: '18px', fontWeight: 500, color: '#ff8a00', lineHeight: 1 }}>T+{gateEta}</div>
-                      <div style={{ fontSize: '8px', color: '#5a6478', marginTop: '2px', letterSpacing: '0.05em' }}>MIN @ GATE</div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-              <ArrowUpFromLine size={14} color="#5a6478" />
-              <span style={{ fontSize: '10px', letterSpacing: '0.2em', color: '#8a94a8', textTransform: 'uppercase', fontWeight: 500 }}>Departing</span>
-            </div>
-            <div style={{ fontSize: '9px', color: '#5a6478', marginBottom: '10px', letterSpacing: '0.05em' }}>LEAVING POMONA NORTH · POST-EVENT EGRESS</div>
-            {departingTrains.map((train) => (
-              <div key={train.id} style={{ padding: '8px 0', borderBottom: '1px solid #14192a', display: 'grid', gridTemplateColumns: '64px 1fr 48px', gap: '8px', alignItems: 'center', opacity: 0.6 }}>
-                <div style={{ fontSize: '10px', fontWeight: 600, color: train.agency === 'Metrolink' ? '#00b8d9' : '#ff8a00', letterSpacing: '0.05em' }}>{train.id}</div>
-                <div style={{ fontSize: '10px', color: '#8a94a8' }}>→ {train.destination}</div>
-                <div style={{ textAlign: 'right', fontSize: '13px', color: '#e4e7ed', fontFamily: "'Fraunces', serif" }}>{train.eta}<span style={{ fontSize: '8px', color: '#5a6478', marginLeft: '2px' }}>M</span></div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* CENTER */}
-        <div style={{ background: '#0d1220', padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-              <MapPin size={16} color="#ff8a00" />
-              <span style={{ fontSize: '11px', letterSpacing: '0.2em', color: '#e4e7ed', textTransform: 'uppercase', fontWeight: 600 }}>Corridor · Pomona North → Fairplex</span>
-            </div>
-            <svg viewBox="0 0 800 180" style={{ width: '100%', height: '180px' }}>
-              <line x1="40" y1="50" x2="760" y2="50" stroke="#1a2030" strokeWidth="20" />
-              <line x1="40" y1="50" x2="760" y2="50" stroke="#2a3142" strokeWidth="2" strokeDasharray="4 4" />
-              <circle cx="40" cy="50" r="8" fill="#0a0e1a" stroke="#ff8a00" strokeWidth="2" />
-              <text x="40" y="30" fill="#e4e7ed" fontSize="10" textAnchor="middle" fontFamily="JetBrains Mono" letterSpacing="0.05em">UNION STN</text>
-              <text x="40" y="76" fill="#5a6478" fontSize="8" textAnchor="middle" fontFamily="JetBrains Mono">↑ A LINE / METROLINK</text>
-              <circle cx="380" cy="50" r="10" fill="#ff8a00" stroke="#0a0e1a" strokeWidth="3" className="pulse-dot" />
-              <text x="380" y="30" fill="#ff8a00" fontSize="11" textAnchor="middle" fontFamily="JetBrains Mono" fontWeight="600" letterSpacing="0.05em">POMONA NORTH</text>
-              <text x="380" y="76" fill="#5a6478" fontSize="8" textAnchor="middle" fontFamily="JetBrains Mono">DUAL-SERVICE</text>
-              <circle cx="760" cy="50" r="8" fill="#0a0e1a" stroke="#00b8d9" strokeWidth="2" />
-              <text x="760" y="30" fill="#e4e7ed" fontSize="10" textAnchor="middle" fontFamily="JetBrains Mono" letterSpacing="0.05em">SAN BERN.</text>
-              <g>
-                <rect x="250" y="42" width="16" height="16" fill="#00b8d9" />
-                <text x="258" y="54" fill="#0a0e1a" fontSize="8" textAnchor="middle" fontFamily="JetBrains Mono" fontWeight="700">ML</text>
-              </g>
-              <g>
-                <rect x="180" y="42" width="16" height="16" fill="#ff8a00" />
-                <text x="188" y="54" fill="#0a0e1a" fontSize="8" textAnchor="middle" fontFamily="JetBrains Mono" fontWeight="700">A</text>
-              </g>
-              <path d="M 380 50 Q 380 120 480 130 L 720 130" stroke="#ff8a00" strokeWidth="2" fill="none" strokeDasharray="3 3" opacity="0.6" />
-              <g>
-                <rect x="700" y="115" width="40" height="30" fill="#0a0e1a" stroke="#ff8a00" strokeWidth="2" />
-                <text x="720" y="133" fill="#ff8a00" fontSize="9" textAnchor="middle" fontFamily="JetBrains Mono" fontWeight="700">FAIRPLEX</text>
-              </g>
-              <circle cx="550" cy="130" r="4" fill="#00ff88" className="pulse-dot" />
-              <text x="550" y="160" fill="#5a6478" fontSize="8" textAnchor="middle" fontFamily="JetBrains Mono">SHUTTLE 03</text>
-              <g transform="translate(40, 150)">
-                <rect x="0" y="0" width="10" height="10" fill="#00b8d9" />
-                <text x="16" y="9" fill="#5a6478" fontSize="9" fontFamily="JetBrains Mono">METROLINK</text>
-                <rect x="100" y="0" width="10" height="10" fill="#ff8a00" />
-                <text x="116" y="9" fill="#5a6478" fontSize="9" fontFamily="JetBrains Mono">METRO A</text>
-                <circle cx="195" cy="5" r="4" fill="#00ff88" />
-                <text x="206" y="9" fill="#5a6478" fontSize="9" fontFamily="JetBrains Mono">SHUTTLE</text>
-              </g>
-            </svg>
-          </div>
-
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Activity size={16} color="#ff8a00" />
-                <span style={{ fontSize: '11px', letterSpacing: '0.2em', color: '#e4e7ed', textTransform: 'uppercase', fontWeight: 600 }}>Gate Arrival Pressure · Event-Day Simulation</span>
-              </div>
-              <span style={{ fontSize: '9px', color: '#5a6478', letterSpacing: '0.1em' }}>MASSMOTION-DERIVED</span>
-            </div>
-            <ResponsiveContainer width="100%" height={220}>
-              <AreaChart data={arrivalCurve} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="transitGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#ff8a00" stopOpacity={0.6} />
-                    <stop offset="100%" stopColor="#ff8a00" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="vehicleGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#00b8d9" stopOpacity={0.4} />
-                    <stop offset="100%" stopColor="#00b8d9" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="2 4" stroke="#1a2030" vertical={false} />
-                <XAxis dataKey="time" stroke="#5a6478" tick={{ fontSize: 10, fontFamily: 'JetBrains Mono' }} />
-                <YAxis stroke="#5a6478" tick={{ fontSize: 10, fontFamily: 'JetBrains Mono' }} />
-                <Area type="monotone" dataKey="vehicle" stackId="1" stroke="#00b8d9" fill="url(#vehicleGrad)" strokeWidth={1.5} />
-                <Area type="monotone" dataKey="transit" stackId="1" stroke="#ff8a00" fill="url(#transitGrad)" strokeWidth={1.5} />
-              </AreaChart>
-            </ResponsiveContainer>
-            <div style={{ display: 'flex', gap: '20px', marginTop: '12px', fontSize: '10px', color: '#5a6478', letterSpacing: '0.05em' }}>
-              <span>━ EVENT START AT T+0</span>
-              <span style={{ color: '#ff8a00' }}>■ TRANSIT ARRIVALS</span>
-              <span style={{ color: '#00b8d9' }}>■ VEHICLE ARRIVALS</span>
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT */}
-        <div style={{ background: '#0d1220', padding: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
-            <Users size={16} color="#ff8a00" />
-            <span style={{ fontSize: '11px', letterSpacing: '0.2em', color: '#e4e7ed', textTransform: 'uppercase', fontWeight: 600 }}>Manual Override</span>
-          </div>
-
-          <div style={{ marginBottom: '32px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <span style={{ fontSize: '10px', color: '#5a6478', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Event Attendance</span>
-              <span style={{ fontFamily: "'Fraunces', serif", fontSize: '20px', color: '#ff8a00', fontWeight: 500 }}>{attendance.toLocaleString()}</span>
-            </div>
-            <input type="range" min="10000" max="150000" step="5000" value={attendance} onChange={(e) => handleSliderChange(setAttendance, Number(e.target.value))} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', color: '#5a6478', marginTop: '6px' }}><span>10K</span><span>150K</span></div>
-          </div>
-
-          <div style={{ marginBottom: '32px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <span style={{ fontSize: '10px', color: '#5a6478', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Transit Modal Share</span>
-              <span style={{ fontFamily: "'Fraunces', serif", fontSize: '20px', color: '#ff8a00', fontWeight: 500 }}>{transitShare}%</span>
-            </div>
-            <input type="range" min="5" max="50" step="1" value={transitShare} onChange={(e) => handleSliderChange(setTransitShare, Number(e.target.value))} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', color: '#5a6478', marginTop: '6px' }}><span>5%</span><span>BASELINE 10%</span><span>50%</span></div>
-          </div>
-
-          <div style={{ marginBottom: '32px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <span style={{ fontSize: '10px', color: '#5a6478', letterSpacing: '0.15em', textTransform: 'uppercase' }}>Shuttle Headway</span>
-              <span style={{ fontFamily: "'Fraunces', serif", fontSize: '20px', color: '#ff8a00', fontWeight: 500 }}>{shuttleFreq}<span style={{ fontSize: '11px', color: '#5a6478', marginLeft: '4px' }}>MIN</span></span>
-            </div>
-            <input type="range" min="5" max="30" step="1" value={shuttleFreq} onChange={(e) => handleSliderChange(setShuttleFreq, Number(e.target.value))} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '9px', color: '#5a6478', marginTop: '6px' }}><span>5 MIN</span><span>30 MIN</span></div>
-          </div>
-
-          <div style={{ background: '#0a0e1a', border: '1px solid #1a2030', padding: '16px', marginTop: '24px' }}>
-            <div style={{ fontSize: '9px', color: '#5a6478', letterSpacing: '0.15em', marginBottom: '12px' }}>SYSTEM STATUS</div>
-            {[
-              { name: 'Metrolink GTFS-RT', status: 'LIVE', color: '#00ff88' },
-              { name: 'Metro Swiftly API', status: 'LIVE', color: '#00ff88' },
-              { name: 'Parking Sensors', status: 'DEMO', color: '#ffaa00' },
-              { name: 'Shuttle GPS', status: 'DEMO', color: '#ffaa00' },
-            ].map((s, i) => (
-              <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 0', borderBottom: i < 3 ? '1px solid #1a2030' : 'none' }}>
-                <span style={{ fontSize: '10px', color: '#8a94a8' }}>{s.name}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <div className="pulse-dot" style={{ width: '6px', height: '6px', background: s.color, borderRadius: '50%' }}></div>
-                  <span style={{ fontSize: '9px', color: s.color, letterSpacing: '0.1em', fontWeight: 600 }}>{s.status}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div style={{ marginTop: '24px', paddingTop: '20px', borderTop: '1px solid #1a2030', display: 'flex', justifyContent: 'space-between', fontSize: '9px', color: '#5a6478', letterSpacing: '0.1em' }}>
-        <span>TWIN AXIS STUDIO · ARRIVAL INTELLIGENCE PLATFORM · POC v0.3</span>
-        <span>IF YOU CAN VISUALIZE IT, YOU CAN UNDERSTAND IT</span>
-      </div>
-    </div>
-  );
+      backgroundImage: 'radial-gradient(circle at 20% 0%, rgba(255, 138, 0, 0.04) 0%, transparent 50%), radial-gradient(circle at 80% 100%, rgba(0, 184, 217, 0.03) 0%, transparent 50%)'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'flex-end',
+      borderBottom: '1px solid #1a2030',
+      paddingBottom: '20px',
+      marginBottom: '24px'
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '12px',
+      marginBottom: '8px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pulse-dot",
+    style: {
+      width: '8px',
+      height: '8px',
+      background: '#00ff88',
+      borderRadius: '50%'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '10px',
+      letterSpacing: '0.2em',
+      color: '#5a6478',
+      textTransform: 'uppercase'
+    }
+  }, "Live Operations Feed")), /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontFamily: "'Fraunces', serif",
+      fontWeight: 300,
+      fontSize: '38px',
+      margin: 0,
+      letterSpacing: '-0.02em',
+      color: '#f5f1e8'
+    }
+  }, "Fairplex Arrival Intelligence"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: '11px',
+      color: '#5a6478',
+      marginTop: '4px',
+      letterSpacing: '0.05em'
+    }
+  }, "POMONA NORTH STATION → FAIRPLEX CORRIDOR / CITY OF POMONA OPERATIONS CONSOLE")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: 'right'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: '32px',
+      fontWeight: 500,
+      color: '#ff8a00',
+      letterSpacing: '0.05em'
+    }
+  }, formatTime(currentTime), /*#__PURE__*/React.createElement("span", {
+    className: "cursor-blink"
+  }, "_")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: '10px',
+      color: '#5a6478',
+      letterSpacing: '0.15em'
+    }
+  }, "PACIFIC / ", currentTime.toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric'
+  }).toUpperCase()))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'grid',
+      gridTemplateColumns: '180px repeat(4, 1fr)',
+      gap: '1px',
+      background: '#1a2030',
+      marginBottom: '24px',
+      border: '1px solid #1a2030'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: '#0d1220',
+      padding: '16px 20px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px'
+    }
+  }, /*#__PURE__*/React.createElement(Calendar, {
+    size: 14,
+    color: "#ff8a00"
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: '9px',
+      color: '#5a6478',
+      letterSpacing: '0.15em',
+      textTransform: 'uppercase'
+    }
+  }, "Event Profile"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: '11px',
+      color: activePreset === 'custom' ? '#ffaa00' : '#e4e7ed',
+      letterSpacing: '0.05em',
+      marginTop: '2px',
+      fontWeight: 600
+    }
+  }, activePreset === 'custom' ? 'CUSTOM' : presets[activePreset]?.label.toUpperCase()))), Object.entries(presets).map(([key, p]) => {
+    const isActive = activePreset === key;
+    return /*#__PURE__*/React.createElement("div", {
+      key: key,
+      className: "preset-btn",
+      onClick: () => applyPreset(key),
+      style: {
+        background: isActive ? '#141a2a' : '#0d1220',
+        padding: '16px 20px',
+        borderLeft: isActive ? `2px solid ${p.accent}` : '2px solid transparent',
+        position: 'relative'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: '6px'
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: '11px',
+        fontWeight: 600,
+        color: isActive ? p.accent : '#e4e7ed',
+        letterSpacing: '0.05em',
+        textTransform: 'uppercase'
+      }
+    }, p.label), isActive && /*#__PURE__*/React.createElement("div", {
+      className: "pulse-dot",
+      style: {
+        width: '6px',
+        height: '6px',
+        background: p.accent,
+        borderRadius: '50%'
+      }
+    })), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: '9px',
+        color: '#5a6478',
+        letterSpacing: '0.1em',
+        textTransform: 'uppercase',
+        marginBottom: '8px'
+      }
+    }, p.sublabel), /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'flex',
+        gap: '12px',
+        fontSize: '9px',
+        color: '#8a94a8'
+      }
+    }, /*#__PURE__*/React.createElement("span", null, (p.attendance / 1000).toFixed(0), "K"), /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: '#5a6478'
+      }
+    }, "·"), /*#__PURE__*/React.createElement("span", null, p.transitShare, "% TRANSIT"), /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: '#5a6478'
+      }
+    }, "·"), /*#__PURE__*/React.createElement("span", null, p.shuttleFreq, "M HEADWAY")));
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(5, 1fr)',
+      gap: '1px',
+      background: '#1a2030',
+      marginBottom: '24px',
+      border: '1px solid #1a2030'
+    }
+  }, [{
+    label: 'Vehicles Removed',
+    value: kpis.vehiclesRemoved.toLocaleString(),
+    unit: 'cars',
+    icon: Car,
+    accent: '#00ff88'
+  }, {
+    label: 'Peak Gate Flow',
+    value: kpis.peakGateFlow.toLocaleString(),
+    unit: 'ppl/hr',
+    icon: Users,
+    accent: '#ff8a00'
+  }, {
+    label: 'Queue Peak Est.',
+    value: kpis.queuePeakMinutes,
+    unit: 'min wait',
+    icon: AlertCircle,
+    accent: kpis.queuePeakMinutes > 15 ? '#ff4444' : '#ffaa00'
+  }, {
+    label: 'CO₂ Avoided',
+    value: (kpis.co2SavedKg / 1000).toFixed(1),
+    unit: 'metric tons',
+    icon: Wind,
+    accent: '#00b8d9'
+  }, {
+    label: 'Shuttle Capacity',
+    value: kpis.shuttleCapacity,
+    unit: 'pax/hr',
+    icon: TrendingDown,
+    accent: '#e4e7ed'
+  }].map((kpi, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    className: "scan-line",
+    style: {
+      background: '#0d1220',
+      padding: '20px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      marginBottom: '12px'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '9px',
+      color: '#5a6478',
+      letterSpacing: '0.15em',
+      textTransform: 'uppercase'
+    }
+  }, kpi.label), /*#__PURE__*/React.createElement(kpi.icon, {
+    size: 14,
+    color: kpi.accent
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Fraunces', serif",
+      fontSize: '34px',
+      fontWeight: 500,
+      color: kpi.accent,
+      lineHeight: 1,
+      letterSpacing: '-0.02em'
+    }
+  }, kpi.value), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: '10px',
+      color: '#5a6478',
+      marginTop: '6px',
+      letterSpacing: '0.1em'
+    }
+  }, kpi.unit.toUpperCase())))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'grid',
+      gridTemplateColumns: '440px 1fr 340px',
+      gap: '1px',
+      background: '#1a2030',
+      border: '1px solid #1a2030'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: '#0d1220',
+      padding: '24px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: '28px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: '4px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px'
+    }
+  }, /*#__PURE__*/React.createElement(ArrowDownToLine, {
+    size: 16,
+    color: "#ff8a00"
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '11px',
+      letterSpacing: '0.2em',
+      color: '#e4e7ed',
+      textTransform: 'uppercase',
+      fontWeight: 600
+    }
+  }, "Inbound · Event-Goers")), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '9px',
+      color: '#5a6478',
+      letterSpacing: '0.1em'
+    }
+  }, "GTFS-RT")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: '9px',
+      color: '#5a6478',
+      marginBottom: '14px',
+      letterSpacing: '0.05em'
+    }
+  }, "ARRIVING POMONA NORTH → CORRIDOR TO FAIRPLEX"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'grid',
+      gridTemplateColumns: '64px 1fr 48px 76px',
+      gap: '8px',
+      padding: '8px 0',
+      borderBottom: '1px solid #1a2030',
+      fontSize: '8px',
+      color: '#5a6478',
+      letterSpacing: '0.15em',
+      textTransform: 'uppercase'
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "Train"), /*#__PURE__*/React.createElement("span", null, "From"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      textAlign: 'right'
+    }
+  }, "ETA"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      textAlign: 'right'
+    }
+  }, "Gate ETA")), inboundTrains.map(train => {
+    const eventGoers = eventGoerLoad(train.capacity, train.inbound);
+    const gateEta = train.eta + CORRIDOR_MINUTES + (train.delay || 0);
+    const isImminent = train.eta < 5;
+    return /*#__PURE__*/React.createElement("div", {
+      key: train.id,
+      onClick: () => setSelectedTrain(train.id === selectedTrain ? null : train.id),
+      style: {
+        padding: '12px 0',
+        borderBottom: '1px solid #1a2030',
+        cursor: 'pointer',
+        background: selectedTrain === train.id ? '#141a2a' : 'transparent',
+        paddingLeft: selectedTrain === train.id ? '12px' : '0',
+        borderLeft: selectedTrain === train.id ? '2px solid #ff8a00' : '2px solid transparent',
+        transition: 'all 0.15s ease'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        display: 'grid',
+        gridTemplateColumns: '64px 1fr 48px 76px',
+        gap: '8px',
+        alignItems: 'center'
+      }
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: '10px',
+        fontWeight: 600,
+        color: train.agency === 'Metrolink' ? '#00b8d9' : '#ff8a00',
+        letterSpacing: '0.05em'
+      }
+    }, train.id), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: '8px',
+        color: '#5a6478',
+        letterSpacing: '0.05em'
+      }
+    }, "PLT ", train.platform)), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: '11px',
+        color: '#e4e7ed'
+      }
+    }, train.origin), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: '9px',
+        color: '#ff8a00',
+        marginTop: '2px'
+      }
+    }, "~", eventGoers, " event-goers")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        textAlign: 'right'
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontFamily: "'Fraunces', serif",
+        fontSize: '20px',
+        fontWeight: 500,
+        color: isImminent ? '#ff8a00' : '#e4e7ed',
+        lineHeight: 1
+      }
+    }, train.eta), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: '8px',
+        color: '#5a6478',
+        marginLeft: '2px'
+      }
+    }, "M"), train.status === 'Delayed' && /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: '8px',
+        color: '#ffaa00',
+        marginTop: '2px'
+      }
+    }, "+", train.delay, "m")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        textAlign: 'right',
+        padding: '6px 8px',
+        background: 'rgba(255, 138, 0, 0.08)',
+        borderLeft: '2px solid #ff8a00'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontFamily: "'Fraunces', serif",
+        fontSize: '18px',
+        fontWeight: 500,
+        color: '#ff8a00',
+        lineHeight: 1
+      }
+    }, "T+", gateEta), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: '8px',
+        color: '#5a6478',
+        marginTop: '2px',
+        letterSpacing: '0.05em'
+      }
+    }, "MIN @ GATE"))));
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      marginBottom: '4px'
+    }
+  }, /*#__PURE__*/React.createElement(ArrowUpFromLine, {
+    size: 14,
+    color: "#5a6478"
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '10px',
+      letterSpacing: '0.2em',
+      color: '#8a94a8',
+      textTransform: 'uppercase',
+      fontWeight: 500
+    }
+  }, "Departing")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: '9px',
+      color: '#5a6478',
+      marginBottom: '10px',
+      letterSpacing: '0.05em'
+    }
+  }, "LEAVING POMONA NORTH · POST-EVENT EGRESS"), departingTrains.map(train => /*#__PURE__*/React.createElement("div", {
+    key: train.id,
+    style: {
+      padding: '8px 0',
+      borderBottom: '1px solid #14192a',
+      display: 'grid',
+      gridTemplateColumns: '64px 1fr 48px',
+      gap: '8px',
+      alignItems: 'center',
+      opacity: 0.6
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: '10px',
+      fontWeight: 600,
+      color: train.agency === 'Metrolink' ? '#00b8d9' : '#ff8a00',
+      letterSpacing: '0.05em'
+    }
+  }, train.id), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: '10px',
+      color: '#8a94a8'
+    }
+  }, "→ ", train.destination), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: 'right',
+      fontSize: '13px',
+      color: '#e4e7ed',
+      fontFamily: "'Fraunces', serif"
+    }
+  }, train.eta, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '8px',
+      color: '#5a6478',
+      marginLeft: '2px'
+    }
+  }, "M")))))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: '#0d1220',
+      padding: '24px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '24px'
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      marginBottom: '20px'
+    }
+  }, /*#__PURE__*/React.createElement(MapPin, {
+    size: 16,
+    color: "#ff8a00"
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '11px',
+      letterSpacing: '0.2em',
+      color: '#e4e7ed',
+      textTransform: 'uppercase',
+      fontWeight: 600
+    }
+  }, "Corridor · Pomona North → Fairplex")), /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 800 180",
+    style: {
+      width: '100%',
+      height: '180px'
+    }
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "40",
+    y1: "50",
+    x2: "760",
+    y2: "50",
+    stroke: "#1a2030",
+    strokeWidth: "20"
+  }), /*#__PURE__*/React.createElement("line", {
+    x1: "40",
+    y1: "50",
+    x2: "760",
+    y2: "50",
+    stroke: "#2a3142",
+    strokeWidth: "2",
+    strokeDasharray: "4 4"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "40",
+    cy: "50",
+    r: "8",
+    fill: "#0a0e1a",
+    stroke: "#ff8a00",
+    strokeWidth: "2"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: "40",
+    y: "30",
+    fill: "#e4e7ed",
+    fontSize: "10",
+    textAnchor: "middle",
+    fontFamily: "JetBrains Mono",
+    letterSpacing: "0.05em"
+  }, "UNION STN"), /*#__PURE__*/React.createElement("text", {
+    x: "40",
+    y: "76",
+    fill: "#5a6478",
+    fontSize: "8",
+    textAnchor: "middle",
+    fontFamily: "JetBrains Mono"
+  }, "↑ A LINE / METROLINK"), /*#__PURE__*/React.createElement("circle", {
+    cx: "380",
+    cy: "50",
+    r: "10",
+    fill: "#ff8a00",
+    stroke: "#0a0e1a",
+    strokeWidth: "3",
+    className: "pulse-dot"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: "380",
+    y: "30",
+    fill: "#ff8a00",
+    fontSize: "11",
+    textAnchor: "middle",
+    fontFamily: "JetBrains Mono",
+    fontWeight: "600",
+    letterSpacing: "0.05em"
+  }, "POMONA NORTH"), /*#__PURE__*/React.createElement("text", {
+    x: "380",
+    y: "76",
+    fill: "#5a6478",
+    fontSize: "8",
+    textAnchor: "middle",
+    fontFamily: "JetBrains Mono"
+  }, "DUAL-SERVICE"), /*#__PURE__*/React.createElement("circle", {
+    cx: "760",
+    cy: "50",
+    r: "8",
+    fill: "#0a0e1a",
+    stroke: "#00b8d9",
+    strokeWidth: "2"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: "760",
+    y: "30",
+    fill: "#e4e7ed",
+    fontSize: "10",
+    textAnchor: "middle",
+    fontFamily: "JetBrains Mono",
+    letterSpacing: "0.05em"
+  }, "SAN BERN."), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("rect", {
+    x: "250",
+    y: "42",
+    width: "16",
+    height: "16",
+    fill: "#00b8d9"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: "258",
+    y: "54",
+    fill: "#0a0e1a",
+    fontSize: "8",
+    textAnchor: "middle",
+    fontFamily: "JetBrains Mono",
+    fontWeight: "700"
+  }, "ML")), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("rect", {
+    x: "180",
+    y: "42",
+    width: "16",
+    height: "16",
+    fill: "#ff8a00"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: "188",
+    y: "54",
+    fill: "#0a0e1a",
+    fontSize: "8",
+    textAnchor: "middle",
+    fontFamily: "JetBrains Mono",
+    fontWeight: "700"
+  }, "A")), /*#__PURE__*/React.createElement("path", {
+    d: "M 380 50 Q 380 120 480 130 L 720 130",
+    stroke: "#ff8a00",
+    strokeWidth: "2",
+    fill: "none",
+    strokeDasharray: "3 3",
+    opacity: "0.6"
+  }), /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("rect", {
+    x: "700",
+    y: "115",
+    width: "40",
+    height: "30",
+    fill: "#0a0e1a",
+    stroke: "#ff8a00",
+    strokeWidth: "2"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: "720",
+    y: "133",
+    fill: "#ff8a00",
+    fontSize: "9",
+    textAnchor: "middle",
+    fontFamily: "JetBrains Mono",
+    fontWeight: "700"
+  }, "FAIRPLEX")), /*#__PURE__*/React.createElement("circle", {
+    cx: "550",
+    cy: "130",
+    r: "4",
+    fill: "#00ff88",
+    className: "pulse-dot"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: "550",
+    y: "160",
+    fill: "#5a6478",
+    fontSize: "8",
+    textAnchor: "middle",
+    fontFamily: "JetBrains Mono"
+  }, "SHUTTLE 03"), /*#__PURE__*/React.createElement("g", {
+    transform: "translate(40, 150)"
+  }, /*#__PURE__*/React.createElement("rect", {
+    x: "0",
+    y: "0",
+    width: "10",
+    height: "10",
+    fill: "#00b8d9"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: "16",
+    y: "9",
+    fill: "#5a6478",
+    fontSize: "9",
+    fontFamily: "JetBrains Mono"
+  }, "METROLINK"), /*#__PURE__*/React.createElement("rect", {
+    x: "100",
+    y: "0",
+    width: "10",
+    height: "10",
+    fill: "#ff8a00"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: "116",
+    y: "9",
+    fill: "#5a6478",
+    fontSize: "9",
+    fontFamily: "JetBrains Mono"
+  }, "METRO A"), /*#__PURE__*/React.createElement("circle", {
+    cx: "195",
+    cy: "5",
+    r: "4",
+    fill: "#00ff88"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: "206",
+    y: "9",
+    fill: "#5a6478",
+    fontSize: "9",
+    fontFamily: "JetBrains Mono"
+  }, "SHUTTLE")))), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginBottom: '20px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px'
+    }
+  }, /*#__PURE__*/React.createElement(Activity, {
+    size: 16,
+    color: "#ff8a00"
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '11px',
+      letterSpacing: '0.2em',
+      color: '#e4e7ed',
+      textTransform: 'uppercase',
+      fontWeight: 600
+    }
+  }, "Gate Arrival Pressure · Event-Day Simulation")), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '9px',
+      color: '#5a6478',
+      letterSpacing: '0.1em'
+    }
+  }, "MASSMOTION-DERIVED")), /*#__PURE__*/React.createElement(ResponsiveContainer, {
+    width: "100%",
+    height: 220
+  }, /*#__PURE__*/React.createElement(AreaChart, {
+    data: arrivalCurve,
+    margin: {
+      top: 10,
+      right: 10,
+      left: 0,
+      bottom: 0
+    }
+  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
+    id: "transitGrad",
+    x1: "0",
+    y1: "0",
+    x2: "0",
+    y2: "1"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "#ff8a00",
+    stopOpacity: 0.6
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "#ff8a00",
+    stopOpacity: 0
+  })), /*#__PURE__*/React.createElement("linearGradient", {
+    id: "vehicleGrad",
+    x1: "0",
+    y1: "0",
+    x2: "0",
+    y2: "1"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "#00b8d9",
+    stopOpacity: 0.4
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "#00b8d9",
+    stopOpacity: 0
+  }))), /*#__PURE__*/React.createElement(CartesianGrid, {
+    strokeDasharray: "2 4",
+    stroke: "#1a2030",
+    vertical: false
+  }), /*#__PURE__*/React.createElement(XAxis, {
+    dataKey: "time",
+    stroke: "#5a6478",
+    tick: {
+      fontSize: 10,
+      fontFamily: 'JetBrains Mono'
+    }
+  }), /*#__PURE__*/React.createElement(YAxis, {
+    stroke: "#5a6478",
+    tick: {
+      fontSize: 10,
+      fontFamily: 'JetBrains Mono'
+    }
+  }), /*#__PURE__*/React.createElement(Area, {
+    type: "monotone",
+    dataKey: "vehicle",
+    stackId: "1",
+    stroke: "#00b8d9",
+    fill: "url(#vehicleGrad)",
+    strokeWidth: 1.5
+  }), /*#__PURE__*/React.createElement(Area, {
+    type: "monotone",
+    dataKey: "transit",
+    stackId: "1",
+    stroke: "#ff8a00",
+    fill: "url(#transitGrad)",
+    strokeWidth: 1.5
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: '20px',
+      marginTop: '12px',
+      fontSize: '10px',
+      color: '#5a6478',
+      letterSpacing: '0.05em'
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "━ EVENT START AT T+0"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: '#ff8a00'
+    }
+  }, "■ TRANSIT ARRIVALS"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: '#00b8d9'
+    }
+  }, "■ VEHICLE ARRIVALS")))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: '#0d1220',
+      padding: '24px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      marginBottom: '24px'
+    }
+  }, /*#__PURE__*/React.createElement(Users, {
+    size: 16,
+    color: "#ff8a00"
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '11px',
+      letterSpacing: '0.2em',
+      color: '#e4e7ed',
+      textTransform: 'uppercase',
+      fontWeight: 600
+    }
+  }, "Manual Override")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: '32px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginBottom: '12px'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '10px',
+      color: '#5a6478',
+      letterSpacing: '0.15em',
+      textTransform: 'uppercase'
+    }
+  }, "Event Attendance"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Fraunces', serif",
+      fontSize: '20px',
+      color: '#ff8a00',
+      fontWeight: 500
+    }
+  }, attendance.toLocaleString())), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "10000",
+    max: "150000",
+    step: "5000",
+    value: attendance,
+    onChange: e => handleSliderChange(setAttendance, Number(e.target.value))
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      fontSize: '9px',
+      color: '#5a6478',
+      marginTop: '6px'
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "10K"), /*#__PURE__*/React.createElement("span", null, "150K"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: '32px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginBottom: '12px'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '10px',
+      color: '#5a6478',
+      letterSpacing: '0.15em',
+      textTransform: 'uppercase'
+    }
+  }, "Transit Modal Share"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Fraunces', serif",
+      fontSize: '20px',
+      color: '#ff8a00',
+      fontWeight: 500
+    }
+  }, transitShare, "%")), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "5",
+    max: "50",
+    step: "1",
+    value: transitShare,
+    onChange: e => handleSliderChange(setTransitShare, Number(e.target.value))
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      fontSize: '9px',
+      color: '#5a6478',
+      marginTop: '6px'
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "5%"), /*#__PURE__*/React.createElement("span", null, "BASELINE 10%"), /*#__PURE__*/React.createElement("span", null, "50%"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: '32px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginBottom: '12px'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '10px',
+      color: '#5a6478',
+      letterSpacing: '0.15em',
+      textTransform: 'uppercase'
+    }
+  }, "Shuttle Headway"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Fraunces', serif",
+      fontSize: '20px',
+      color: '#ff8a00',
+      fontWeight: 500
+    }
+  }, shuttleFreq, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '11px',
+      color: '#5a6478',
+      marginLeft: '4px'
+    }
+  }, "MIN"))), /*#__PURE__*/React.createElement("input", {
+    type: "range",
+    min: "5",
+    max: "30",
+    step: "1",
+    value: shuttleFreq,
+    onChange: e => handleSliderChange(setShuttleFreq, Number(e.target.value))
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      fontSize: '9px',
+      color: '#5a6478',
+      marginTop: '6px'
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "5 MIN"), /*#__PURE__*/React.createElement("span", null, "30 MIN"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: '#0a0e1a',
+      border: '1px solid #1a2030',
+      padding: '16px',
+      marginTop: '24px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: '9px',
+      color: '#5a6478',
+      letterSpacing: '0.15em',
+      marginBottom: '12px'
+    }
+  }, "SYSTEM STATUS"), [{
+    name: 'Metrolink GTFS-RT',
+    status: 'LIVE',
+    color: '#00ff88'
+  }, {
+    name: 'Metro Swiftly API',
+    status: 'LIVE',
+    color: '#00ff88'
+  }, {
+    name: 'Parking Sensors',
+    status: 'DEMO',
+    color: '#ffaa00'
+  }, {
+    name: 'Shuttle GPS',
+    status: 'DEMO',
+    color: '#ffaa00'
+  }].map((s, i) => /*#__PURE__*/React.createElement("div", {
+    key: i,
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      padding: '6px 0',
+      borderBottom: i < 3 ? '1px solid #1a2030' : 'none'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '10px',
+      color: '#8a94a8'
+    }
+  }, s.name), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: '6px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pulse-dot",
+    style: {
+      width: '6px',
+      height: '6px',
+      background: s.color,
+      borderRadius: '50%'
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: '9px',
+      color: s.color,
+      letterSpacing: '0.1em',
+      fontWeight: 600
+    }
+  }, s.status))))))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: '24px',
+      paddingTop: '20px',
+      borderTop: '1px solid #1a2030',
+      display: 'flex',
+      justifyContent: 'space-between',
+      fontSize: '9px',
+      color: '#5a6478',
+      letterSpacing: '0.1em'
+    }
+  }, /*#__PURE__*/React.createElement("span", null, "TWIN AXIS STUDIO · ARRIVAL INTELLIGENCE PLATFORM · POC v0.3"), /*#__PURE__*/React.createElement("span", null, "IF YOU CAN VISUALIZE IT, YOU CAN UNDERSTAND IT")));
 }
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<PomonaFairplexDashboard />);
+root.render(/*#__PURE__*/React.createElement(PomonaFairplexDashboard, null));
 </script>
 </body>
 </html>
